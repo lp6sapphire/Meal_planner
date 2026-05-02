@@ -90,14 +90,16 @@ h3 { font-size: 18px; font-weight: 600; }
 .now-bar .now-go:hover { background: var(--accent-deep); }
 .now-bar .now-go[disabled] { background: var(--line); color: var(--ink-muted); cursor: default; }
 
-.meal.now-meal { box-shadow: 0 0 0 2px var(--gold), var(--shadow); }
+.meal.now-meal { box-shadow: 0 0 0 2px var(--gold), var(--shadow); margin-top: 16px; }
 .meal.now-meal .meal-header { position: relative; }
 .meal.now-meal .meal-header::before {
   content: 'СЕЙЧАС';
-  position: absolute; top: -8px; left: 12px;
+  position: absolute; top: -10px; left: 12px;
   background: var(--gold); color: var(--bg-elev);
   font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
-  padding: 2px 7px; border-radius: 4px;
+  padding: 3px 8px; border-radius: 4px;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(31,28,24,0.2);
 }
 
 .day-summary { background: var(--bg-elev); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--line-soft); }
