@@ -10,6 +10,56 @@
 
 Состояние сохраняется в `localStorage` браузера (профили, группы закупок, отметки покупок, выбор упаковок).
 
+## Деплой на GitHub Pages
+
+Чтобы открыть приложение с iPhone и добавить на главный экран как нативное:
+
+### 1. Создать репозиторий
+1. Зайти на github.com → **New repository**.
+2. Имя: например `meal-planner`. Public.
+3. Без `README` (он уже есть).
+
+### 2. Push файлов
+В папке проекта (`Meal planner`) выполнить (через Git Bash или терминал):
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/<твой-username>/meal-planner.git
+git push -u origin main
+```
+
+### 3. Включить GitHub Pages
+1. В репозитории → **Settings** → **Pages** (слева в меню).
+2. Source: **Deploy from a branch**.
+3. Branch: **main**, folder: **/(root)**. Save.
+4. Через 1-2 минуты страница доступна по адресу:
+   `https://<твой-username>.github.io/meal-planner/`
+
+### 4. Добавить на главный экран iPhone
+1. Открыть URL в **Safari** на iPhone (важно — в Safari, не в Chrome).
+2. Нажать **«Поделиться»** (квадрат со стрелкой вверх).
+3. **«На экран Домой»**.
+4. Подтвердить — на главном экране появится иконка с серифной «П».
+
+При запуске с главного экрана приложение откроется в standalone-режиме (без панелей Safari) — как нативное.
+
+### Иконки и manifest
+
+В корне папки рядом с `index.html`:
+- `manifest.webmanifest` — PWA-манифест (имя, цвета, иконки)
+- `icon-32.png`, `icon-152.png`, `icon-167.png`, `icon-180.png`, `icon-192.png`, `icon-512.png`, `icon-512-maskable.png`, `apple-touch-icon.png`
+
+Все размеры под:
+- iOS apple-touch-icon (152, 167, 180)
+- PWA manifest (192, 512, 512-maskable)
+- Browser favicon (32)
+
+Чтобы заменить иконку — положи свой PNG (≥512×512) и пересоздай размеры через Pillow или онлайн-генератор (например, realfavicongenerator.net).
+
+
 ## Вкладки
 
 | Вкладка | Назначение |
