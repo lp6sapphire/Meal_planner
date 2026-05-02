@@ -3,8 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <title>План питания · 7 дней</title>
+
+<!-- PWA / iOS web-app иконка -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#7d4a32">
+
+<!-- iOS: home-screen ярлык -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="План питания">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icon-167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+
+<!-- Стандартные favicon -->
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -558,80 +574,85 @@ table.kbju-table tr.avg td { background: var(--sage-soft); color: var(--sage); f
 //   prep — рецепт заготовки: { kind: 'cooked'|'marinated', time, name, instruction, dryName?, cookedName? }
 //   packs — варианты упаковок ВкусВилла: [{size, label}], первый — дефолт
 const FOOD = {
-  tvorog0:    { name: 'Творог 0%',              kcal: 71,  p: 16,   f: 0.6, c: 1.8, cat: 'Молочка', packs: [{size:200,label:'200г'},{size:350,label:'350г'},{size:500,label:'500г'}] },
-  yogurt2:    { name: 'Греческий йогурт 2%',    kcal: 73,  p: 8,    f: 2,   c: 4,   cat: 'Молочка', packs: [{size:130,label:'130г'},{size:300,label:'300г'},{size:500,label:'500г'}] },
-  tvorsyr:    { name: 'Творожный сыр',          kcal: 230, p: 6,    f: 22,  c: 2,   cat: 'Молочка', packs: [{size:140,label:'140г'},{size:200,label:'200г'},{size:300,label:'300г'}] },
-  mozarella:  { name: 'Моцарелла мини',         kcal: 250, p: 18,   f: 19,  c: 1,   cat: 'Молочка', packs: [{size:125,label:'125г шарики'},{size:250,label:'250г'}] },
-  kokmoloko:  { name: 'Кокосовый напиток',      kcal: 48,  p: 1.5,  f: 2,   c: 6,   cat: 'Молочка', cookFactor: 1, packs: [{size:1000,label:'1л'},{size:200,label:'200мл'}] },
-  yaytso:     { name: 'Яйцо С0',                kcal: 157, p: 12.7, f: 11,  c: 0.7, cat: 'Молочка', unit: 'шт~55г', cookFactor: 0.90, packs: [{size:550,label:'10 шт'},{size:330,label:'6 шт'}] },
+  tvorog0:    { name: 'Творог обезжиренный ВВ', kcal: 88,  p: 18,   f: 0.4, c: 3.3, cat: 'Молочка', perishable: true, packs: [{size:180,label:'180г'},{size:360,label:'2×180г'}] },
+  tvorogm:    { name: 'Творог мягкий 5% ВВ',    kcal: 122, p: 9,    f: 5,   c: 9,   cat: 'Молочка', perishable: true, packs: [{size:130,label:'130г'},{size:200,label:'200г'}] },
+  yogurt2:    { name: 'Греческий йогурт Teos 2%', kcal: 67,  p: 8,    f: 2,   c: 4.2, cat: 'Молочка', perishable: true, packs: [{size:250,label:'250г'},{size:500,label:'2×250г'}] },
+  tvorsyr:    { name: 'Творожный сыр лёгкий ВВ', kcal: 150, p: 6,    f: 12,  c: 4,   cat: 'Молочка', perishable: true, packs: [{size:140,label:'140г'}] },
+  mozarella:  { name: 'Моцарелла мини в рассоле ВВ', kcal: 240, p: 18,   f: 19,  c: 1,   cat: 'Молочка', perishable: true, packs: [{size:125,label:'125г'}] },
+  // Кокосовый «напиток» из 100% мякоти — концентрированные сливки. Разводить водой 1:3–1:4.
+  // КБЖУ хранятся как в плане (≈48 ккал/100г готовой жидкости после разведения). Если льёшь концентрат — учитывай ×3-4 ккал.
+  kokmoloko:  { name: 'Кокос. напиток (разведённый 1:3) ВВ', kcal: 48,  p: 1.5,  f: 2,   c: 6,   cat: 'Молочка', cookFactor: 1, packs: [{size:1000,label:'1л концентрата'}] },
+  yaytso:     { name: 'Яйцо С0 ВВ',             kcal: 157, p: 12.7, f: 11,  c: 0.7, cat: 'Молочка', unit: '1 шт ~70г', cookFactor: 0.90, packs: [{size:700,label:'10 шт ~70г'}] },
 
-  kurica:     { name: 'Куриная грудка',         kcal: 113, p: 23.6, f: 1.9, c: 0,   cat: 'Мясо/рыба', cookFactor: 0.75,
+  kurica:     { name: 'Филе грудки цыплёнка ВВ', kcal: 111.5, p: 23.6, f: 1.9, c: 0,   cat: 'Мясо/рыба', cookFactor: 0.75,
     prep: { kind:'cooked', time:40, name:'Куриная грудка су-вид/аэрогриль',
             instruction:'Промыть. Натереть смесью: соевый соус 30мл + паприка + чеснок + чёрный перец. Маринуется 15 мин. Аэрогриль 25 мин при 180°C, переворачивая каждые 8 мин.' },
-    packs: [{size:500,label:'~500г филе'},{size:1000,label:'~1кг'},{size:700,label:'~700г'}] },
-  indeika:    { name: 'Филе индейки',           kcal: 109, p: 22,   f: 2,   c: 0,   cat: 'Мясо/рыба', cookFactor: 0.75,
+    packs: [{size:700,label:'~700г уп.'}] },
+  indeika:    { name: 'Филе индейки малое ВВ',   kcal: 105.5, p: 23, f: 1.5, c: 0,   cat: 'Мясо/рыба', cookFactor: 0.75,
     prep: { kind:'cooked', time:30, name:'Стейки филе индейки',
             instruction:'Нарезать стейками 100-110г. Маринад: соевый соус 20мл + чеснок + орегано + паприка, 10 мин. Аэрогриль 18 мин при 180°C, перевернуть на 9-й.' },
-    packs: [{size:500,label:'~500г'},{size:700,label:'~700г'},{size:1000,label:'~1кг'}] },
-  semga:      { name: 'Семга охл.',             kcal: 198, p: 21,   f: 13,  c: 0,   cat: 'Мясо/рыба', fresh: true, cookFactor: 0.82,
-    packs: [{size:250,label:'~250г стейк'},{size:400,label:'~400г филе'},{size:500,label:'~500г'}] },
-  forel:      { name: 'Форель слабосол.',       kcal: 200, p: 21,   f: 13,  c: 0,   cat: 'Мясо/рыба', packs: [{size:120,label:'120г'},{size:200,label:'200г'},{size:250,label:'250г'}] },
-  krevetki:   { name: 'Креветки очищ.',         kcal: 95,  p: 19,   f: 1.5, c: 0.5, cat: 'Мясо/рыба', fresh: true, cookFactor: 0.82, packs: [{size:200,label:'200г'},{size:300,label:'300г'},{size:500,label:'500г'}] },
+    packs: [{size:750,label:'~750г уп.'}] },
+  semga:      { name: 'Сёмга филе на коже охл. ВВ', kcal: 200, p: 21,   f: 13,  c: 0,   cat: 'Мясо/рыба', fresh: true, cookFactor: 0.82,
+    packs: [{size:350,label:'~350г уп.'}] },
+  forel:      { name: 'Форель малосол. ломтики ВВ', kcal: 160, p: 19,   f: 9,   c: 0,   cat: 'Мясо/рыба',
+    packs: [{size:150,label:'150г'}] },
+  krevetki:   { name: 'Креветки аргент. дикие 40/60 ВВ', kcal: 62.5, p: 13.6, f: 0.9, c: 0, cat: 'Мясо/рыба', fresh: true, cookFactor: 0.82,
+    packs: [{size:500,label:'500г'}] },
 
-  zalivnoe:   { name: 'Заливное из индейки',    kcal: 95,  p: 12,   f: 4,   c: 2,   cat: 'Готовое ВВ', packs: [{size:250,label:'250г'},{size:500,label:'500г'}] },
-  zapek:      { name: 'Запеканка творожная',    kcal: 155, p: 12,   f: 4,   c: 18,  cat: 'Готовое ВВ', packs: [{size:200,label:'200г порция'},{size:400,label:'400г'}] },
-  syrniki:    { name: 'Сырники',                kcal: 220, p: 12,   f: 9,   c: 22,  cat: 'Готовое ВВ', packs: [{size:240,label:'240г уп.'},{size:120,label:'120г порция'}] },
-  sup:        { name: 'Суп с лапшой',           kcal: 50,  p: 3,    f: 1.5, c: 6,   cat: 'Готовое ВВ', packs: [{size:500,label:'500г пакет'},{size:1000,label:'1кг'}] },
-  pyure:      { name: 'Пюре картофельное ВВ',   kcal: 80,  p: 2,    f: 2,   c: 14,  cat: 'Готовое ВВ', packs: [{size:400,label:'400г'},{size:200,label:'200г порция'}] },
+  zalivnoe:   { name: 'Заливное из индейки с хреном ВВ', kcal: 36, p: 8, f: 1, c: 0.5, cat: 'Готовое ВВ', packs: [{size:250,label:'250г'}] },
+  zapek:      { name: 'Запеканка творожная без сахара ВВ', kcal: 103, p: 8.4, f: 4.5, c: 7.2, cat: 'Готовое ВВ', packs: [{size:220,label:'220г'}] },
+  syrniki:    { name: 'Сырники запечённые ВВ', kcal: 175.5, p: 14, f: 3.5, c: 22, cat: 'Готовое ВВ', packs: [{size:600,label:'600г большая порция'}] },
+  sup:        { name: 'Суп «Куриный» с лапшой ВВ', kcal: 50, p: 3, f: 1.5, c: 6, cat: 'Готовое ВВ', packs: [{size:1000,label:'1кг'}] },
+  pyure:      { name: 'Картофельное пюре ВВ',   kcal: 90,  p: 2,    f: 3,   c: 14,  cat: 'Готовое ВВ', packs: [{size:500,label:'500г'}] },
 
-  ovsyanka:   { name: 'Овсянка длинной варки',  kcal: 360, p: 11,   f: 6.5, c: 65,  cat: 'Крупы', cookFactor: 3.0, packs: [{size:500,label:'500г'},{size:400,label:'400г'},{size:1000,label:'1кг'}] },
-  grechka:    { name: 'Гречка ядрица',          kcal: 313, p: 12.6, f: 3.3, c: 62,  cat: 'Крупы', cookFactor: 2.5,
+  ovsyanka:   { name: 'Геркулес овсяные хлопья ВВ', kcal: 352, p: 12, f: 6, c: 62, cat: 'Крупы', cookFactor: 3.0, packs: [{size:500,label:'500г'}] },
+  grechka:    { name: 'Гречка ядрица ВВ',       kcal: 313, p: 12.6, f: 3.3, c: 62,  cat: 'Крупы', cookFactor: 2.5,
     prep: { kind:'cooked', time:25, dryName:'сухой', cookedName:'готовой', name:'Гречка отварная',
             instruction:'Промыть. Мультиварка режим «крупа» с водой 1:2 + соль. Или кастрюля 20 мин на медленном огне.' },
-    packs: [{size:800,label:'800г'},{size:500,label:'500г'},{size:1000,label:'1кг'}] },
-  perlovka:   { name: 'Перловка',               kcal: 320, p: 9.3,  f: 1.1, c: 67,  cat: 'Крупы', cookFactor: 3.0,
+    packs: [{size:800,label:'800г'},{size:1000,label:'1кг'}] },
+  perlovka:   { name: 'Перловка ВВ',            kcal: 320, p: 9.3,  f: 1.1, c: 67,  cat: 'Крупы', cookFactor: 3.0,
     prep: { kind:'cooked', time:40, dryName:'сухой', cookedName:'готовой', name:'Перловка отварная',
             instruction:'Промыть, замочить минимум на 30 мин. Мультиварка «крупа» 35 мин с водой 1:3 + соль. Или варить 40 мин.' },
     packs: [{size:500,label:'500г'},{size:800,label:'800г'}] },
-  risbasmati: { name: 'Рис басмати',            kcal: 350, p: 7,    f: 1,   c: 78,  cat: 'Крупы', cookFactor: 3.0, packs: [{size:500,label:'500г'},{size:800,label:'800г'},{size:1000,label:'1кг'}] },
-  chechevitsa:{ name: 'Чечевица красная',       kcal: 314, p: 24,   f: 1.5, c: 53,  cat: 'Крупы', cookFactor: 2.6,
+  risbasmati: { name: 'Рис басмати ВВ',         kcal: 350, p: 7,    f: 1,   c: 78,  cat: 'Крупы', cookFactor: 3.0, packs: [{size:500,label:'500г'},{size:1000,label:'1кг'}] },
+  chechevitsa:{ name: 'Чечевица красная ВВ',    kcal: 314, p: 24,   f: 1.5, c: 53,  cat: 'Крупы', cookFactor: 2.6,
     prep: { kind:'cooked', time:15, dryName:'сухой', cookedName:'готовой', name:'Чечевица красная',
             instruction:'Промыть, отварить 15 мин в подсоленной воде.' },
     packs: [{size:400,label:'400г'},{size:800,label:'800г'}] },
-  hlebec:     { name: 'Хлебец цельнозерн.',     kcal: 360, p: 11,   f: 3,   c: 65,  cat: 'Крупы', unit: '1 шт ~10г', packs: [{size:100,label:'100г уп. (~10 шт)'},{size:150,label:'150г'}] },
+  hlebec:     { name: 'Хлебцы цельнозерн. ВВ',  kcal: 360, p: 11,   f: 3,   c: 65,  cat: 'Крупы', unit: '1 шт ~10г', packs: [{size:100,label:'100г уп. (~10 шт)'}] },
 
-  ogurec:     { name: 'Огурец',                 kcal: 14,  p: 0.8,  f: 0.1, c: 2.5, cat: 'Овощи',
+  ogurec:     { name: 'Огурец ВВ',              kcal: 14,  p: 0.8,  f: 0.1, c: 2.5, cat: 'Овощи',
     prep: { kind:'cut', time:5, name:'Огурец', instruction:'Кружочки или соломка.' },
-    packs: [{size:1000,label:'~1кг весовое'},{size:500,label:'500г уп.'},{size:300,label:'300г уп.'}] },
-  cherry:     { name: 'Помидоры черри',         kcal: 19,  p: 0.9,  f: 0.2, c: 3.5, cat: 'Овощи',
+    packs: [{size:200,label:'~1 шт ~200г'},{size:500,label:'500г весовое'},{size:1000,label:'~1кг весовое'}] },
+  cherry:     { name: 'Томаты черри красные ВВ', kcal: 18, p: 0.9, f: 0.2, c: 3.9, cat: 'Овощи',
     prep: { kind:'cut', time:3, name:'Помидоры черри', instruction:'Половинками.' },
-    packs: [{size:250,label:'250г'},{size:500,label:'500г'}] },
-  perec:      { name: 'Перец болгарский',       kcal: 27,  p: 1.3,  f: 0.3, c: 5,   cat: 'Овощи', cookFactor: 0.85,
+    packs: [{size:400,label:'400г'}] },
+  perec:      { name: 'Перец болгарский ВВ',    kcal: 27,  p: 1.3,  f: 0.3, c: 5,   cat: 'Овощи', cookFactor: 0.85,
     prep: { kind:'cut', time:5, name:'Перец болгарский', instruction:'Удалить семена, соломка или кубик. Для запекания — сразу в контейнер с маринадом.' },
-    packs: [{size:200,label:'~200г шт'},{size:500,label:'500г'}] },
-  kabachok:   { name: 'Кабачок',                kcal: 19,  p: 1.2,  f: 0.2, c: 3,   cat: 'Овощи', cookFactor: 0.80,
+    packs: [{size:350,label:'350г'}] },
+  kabachok:   { name: 'Кабачок ВВ',             kcal: 19,  p: 1.2,  f: 0.2, c: 3,   cat: 'Овощи', cookFactor: 0.80,
     prep: { kind:'cut', time:5, name:'Кабачок', instruction:'Полукружия или кубик (лучше готовить сразу).' },
-    packs: [{size:300,label:'~300г шт'},{size:500,label:'500г'},{size:1000,label:'~1кг'}] },
-  shpinat:    { name: 'Шпинат',                 kcal: 23,  p: 2.9,  f: 0.4, c: 1.4, cat: 'Овощи', perishable: true, cookFactor: 0.50, packs: [{size:100,label:'100г уп.'},{size:200,label:'200г'}] },
-  luk:        { name: 'Лук',                    kcal: 41,  p: 1.4,  f: 0.2, c: 8.2, cat: 'Овощи', cookFactor: 0.75, packs: [{size:1000,label:'~1кг сетка'},{size:500,label:'500г'}] },
+    packs: [{size:600,label:'600г'}] },
+  shpinat:    { name: 'Салат Шпинат ВВ',        kcal: 23,  p: 2.9,  f: 0.4, c: 1.4, cat: 'Овощи', perishable: true, cookFactor: 0.50, packs: [{size:50,label:'50г уп.'}] },
+  luk:        { name: 'Лук репчатый ВВ',        kcal: 41,  p: 1.4,  f: 0.2, c: 8.2, cat: 'Овощи', cookFactor: 0.75, packs: [{size:400,label:'400г сетка'}] },
 
-  rukola:     { name: 'Руккола',                kcal: 25,  p: 2.6,  f: 0.7, c: 2,   cat: 'Зелень', perishable: true, packs: [{size:50,label:'50г уп.'},{size:80,label:'80г'},{size:125,label:'125г'}] },
-  zelen:      { name: 'Зелень укроп/петрушка',  kcal: 36,  p: 3,    f: 0.5, c: 6,   cat: 'Зелень', perishable: true, packs: [{size:50,label:'50г пучок'},{size:30,label:'30г'},{size:100,label:'100г'}] },
+  rukola:     { name: 'Салат Руккола ВВ',       kcal: 25,  p: 2.6,  f: 0.7, c: 2,   cat: 'Зелень', perishable: true, packs: [{size:50,label:'50г уп.'}] },
+  zelen:      { name: 'Микс укроп+петрушка ВВ', kcal: 36,  p: 3,    f: 0.5, c: 6,   cat: 'Зелень', perishable: true, packs: [{size:50,label:'50г пучок'}] },
 
-  golubika:   { name: 'Голубика заморож.',      kcal: 39,  p: 0.7,  f: 0.5, c: 8,   cat: 'Ягоды/фрукты', packs: [{size:300,label:'300г заморозка'},{size:500,label:'500г'}] },
-  klubnika:   { name: 'Клубника',               kcal: 32,  p: 0.7,  f: 0.3, c: 7,   cat: 'Ягоды/фрукты', perishable: true, packs: [{size:250,label:'250г'},{size:400,label:'400г'},{size:500,label:'500г'}] },
-  banan:      { name: 'Банан',                  kcal: 89,  p: 1.1,  f: 0.3, c: 23,  cat: 'Ягоды/фрукты', packs: [{size:1000,label:'~1кг весовое'},{size:150,label:'~1 шт'}] },
-  yabloko:    { name: 'Яблоко',                 kcal: 52,  p: 0.3,  f: 0.2, c: 14,  cat: 'Ягоды/фрукты', packs: [{size:1000,label:'~1кг весовое'},{size:180,label:'~1 шт'}] },
+  golubika:   { name: 'Голубика свежая ВВ',     kcal: 39,  p: 1,    f: 0.5, c: 8,   cat: 'Ягоды/фрукты', perishable: true, packs: [{size:250,label:'250г'},{size:500,label:'500г'}] },
+  klubnika:   { name: 'Клубника свежая ВВ',     kcal: 32,  p: 0.7,  f: 0.3, c: 7,   cat: 'Ягоды/фрукты', perishable: true, packs: [{size:250,label:'250г'},{size:500,label:'500г'}] },
+  banan:      { name: 'Банан весовой ВВ',       kcal: 89,  p: 1.1,  f: 0.3, c: 23,  cat: 'Ягоды/фрукты', packs: [{size:150,label:'~1 шт'},{size:1000,label:'~1кг весовое'}] },
+  yabloko:    { name: 'Яблоко весовое ВВ',      kcal: 52,  p: 0.3,  f: 0.2, c: 14,  cat: 'Ягоды/фрукты', packs: [{size:180,label:'~1 шт'},{size:1000,label:'~1кг весовое'}] },
 
-  oilolive:   { name: 'Оливковое масло',        kcal: 884, p: 0,    f: 100, c: 0,   cat: 'Прочее', packs: [{size:500,label:'500мл'},{size:250,label:'250мл'},{size:1000,label:'1л'}] },
-  mindal:     { name: 'Миндаль',                kcal: 575, p: 21,   f: 49,  c: 22,  cat: 'Прочее', packs: [{size:150,label:'150г'},{size:200,label:'200г'},{size:300,label:'300г'}] },
-  orehgrec:   { name: 'Грецкий орех',           kcal: 654, p: 15,   f: 65,  c: 14,  cat: 'Прочее', packs: [{size:150,label:'150г'},{size:200,label:'200г'}] },
-  chia:       { name: 'Семена чиа',             kcal: 486, p: 17,   f: 31,  c: 42,  cat: 'Прочее', packs: [{size:150,label:'150г'},{size:250,label:'250г'}] },
-  len:        { name: 'Семена льна',            kcal: 534, p: 18,   f: 42,  c: 29,  cat: 'Прочее', packs: [{size:200,label:'200г'},{size:300,label:'300г'}] },
-  med:        { name: 'Мёд',                    kcal: 304, p: 0.3,  f: 0,   c: 82,  cat: 'Прочее', packs: [{size:250,label:'250г'},{size:500,label:'500г'}] },
-  gorchica:   { name: 'Горчица дижонская',      kcal: 66,  p: 4,    f: 4,   c: 5,   cat: 'Прочее', packs: [{size:130,label:'130г'},{size:200,label:'200г'}] },
-  pesto:      { name: 'Песто',                  kcal: 360, p: 6,    f: 35,  c: 4,   cat: 'Прочее', packs: [{size:90,label:'90г баночка'},{size:140,label:'140г'}] },
-  shokoladd:  { name: 'Шоколад горький 70%+',   kcal: 580, p: 7,    f: 42,  c: 38,  cat: 'Прочее', packs: [{size:90,label:'90г плитка'},{size:100,label:'100г'}] },
+  oilolive:   { name: 'Масло оливковое Extra Virgin ВВ', kcal: 884, p: 0, f: 100, c: 0, cat: 'Прочее', packs: [{size:250,label:'250мл'},{size:500,label:'500мл'},{size:1000,label:'1л'}] },
+  mindal:     { name: 'Миндаль ВВ',             kcal: 575, p: 21,   f: 49,  c: 22,  cat: 'Прочее', packs: [{size:150,label:'150г'},{size:300,label:'300г'}] },
+  orehgrec:   { name: 'Грецкий орех ВВ',        kcal: 654, p: 15,   f: 65,  c: 14,  cat: 'Прочее', packs: [{size:150,label:'150г'},{size:200,label:'200г'}] },
+  chia:       { name: 'Семена чиа ВВ',          kcal: 486, p: 17,   f: 31,  c: 42,  cat: 'Прочее', packs: [{size:150,label:'150г'},{size:250,label:'250г'}] },
+  len:        { name: 'Семена льна ВВ',         kcal: 534, p: 18,   f: 42,  c: 29,  cat: 'Прочее', packs: [{size:200,label:'200г'},{size:300,label:'300г'}] },
+  med:        { name: 'Мёд натуральный ВВ',     kcal: 304, p: 0.3,  f: 0,   c: 82,  cat: 'Прочее', packs: [{size:250,label:'250г'},{size:500,label:'500г'}] },
+  gorchica:   { name: 'Горчица дижонская ВВ',   kcal: 66,  p: 4,    f: 4,   c: 5,   cat: 'Прочее', packs: [{size:130,label:'130г'},{size:200,label:'200г'}] },
+  pesto:      { name: 'Песто ВВ',               kcal: 360, p: 6,    f: 35,  c: 4,   cat: 'Прочее', packs: [{size:90,label:'90г'},{size:140,label:'140г'}] },
+  shokoladd:  { name: 'Шоколад горький 72%+ ВВ', kcal: 580, p: 7,    f: 42,  c: 38,  cat: 'Прочее', packs: [{size:90,label:'90г плитка'},{size:100,label:'100г'}] },
   protein:    { name: 'Протеин (изолят/казеин)',kcal: 360, p: 80,   f: 3,   c: 5,   cat: 'Прочее', lpOnly: true, packs: [{size:900,label:'900г банка'},{size:450,label:'450г'}] }
 };
 
@@ -660,7 +681,7 @@ const DISHES = {
 
   pn_s1: { name: 'Белковый перекус (post-tren)',
     lp: [['protein', 15]],
-    partner: [['tvorog0', 150]],
+    partner: [['tvorogm', 130]],
     cook: ['Варианты на выбор: <b>протеин</b> 25-30г в шейкере с 250мл воды/молока, ИЛИ <b>творог</b> 100-150г, ИЛИ <b>греческий йогурт</b> 200г.','LP — обычно протеин (post-tren). IS — творог.'] },
   pn_s2: { name: 'Американо + банан с миндалём', unifiedCook: true,
     lp: [['banan', 100], ['mindal', 10]],
@@ -689,7 +710,7 @@ const DISHES = {
 
   vt_s1: { name: 'Белковый перекус (post-tren)',
     lp: [['protein', 20]],
-    partner: [['tvorog0', 150]],
+    partner: [['tvorogm', 130]],
     cook: ['Варианты: протеин 25-30г в шейкере с 250мл воды/молока, ИЛИ творог 100-150г, ИЛИ йогурт 200г.','LP — протеин. IS — творог.'] },
   vt_s2: { name: 'Американо + яблоко с грецким орехом', unifiedCook: true,
     lp: [['yabloko', 150], ['orehgrec', 15]],
@@ -748,7 +769,7 @@ const DISHES = {
 
   ch_s1: { name: 'Белковый перекус (post-tren)',
     lp: [['protein', 25]],
-    partner: [['tvorog0', 150]],
+    partner: [['tvorogm', 130]],
     cook: ['Варианты: протеин 25-30г в шейкере с 250мл воды/молока, ИЛИ творог 100-150г, ИЛИ йогурт 200г.','LP — протеин. IS — творог.'] },
   ch_s2: { name: 'Американо + банан с миндалём', unifiedCook: true,
     lp: [['banan', 80], ['mindal', 10]],
@@ -781,7 +802,7 @@ const DISHES = {
 
   pt_s1: { name: 'Белковый перекус (post-tren)',
     lp: [['protein', 15]],
-    partner: [['tvorog0', 150]],
+    partner: [['tvorogm', 130]],
     cook: ['Варианты: протеин 25-30г в шейкере с 250мл воды/молока, ИЛИ творог 100-150г, ИЛИ йогурт 200г.','LP — протеин. IS — творог.'] },
   pt_s2: { name: 'Американо + яблоко с миндалём', unifiedCook: true,
     lp: [['yabloko', 150], ['mindal', 10]],
@@ -833,7 +854,7 @@ const DISHES = {
 
   vs_s1: { name: 'Белковый перекус',
     lp: [['protein', 20]],
-    partner: [['tvorog0', 100]],
+    partner: [['tvorogm', 130]],
     cook: ['Варианты: протеин 25-30г в шейкере с 250мл воды/молока, ИЛИ творог 100-150г, ИЛИ йогурт 200г.','LP — протеин. IS — творог.'] },
   vs_s2: { name: 'Чай + хлебец с творожным сыром и клубникой', unifiedCook: true,
     lp: [['hlebec', 10], ['tvorsyr', 25], ['klubnika', 80]],
@@ -1624,7 +1645,7 @@ function renderShopToolbar() {
   const info = document.getElementById('shopInfo');
   if (info) {
     const tripsList = TRIPS.map(t => `${t.icon||''} <b>${t.name}</b> (${t.days.join('/')||'нет дней'})`).join(' · ');
-    info.innerHTML = `<b>Групп закупок: ${TRIPS.length}.</b> ${tripsList}. Граммовки = сумма из меню для ${PROFILE.lp.name} и ${PROFILE.is.name}. Изменить — на вкладке «Профиль».`;
+    info.innerHTML = `<b>Как пользоваться:</b> выбери группу закупок (${tripsList}) — увидишь, что взять за один поход. Свежие продукты (мясо/рыба/зелень/молочка) распределены по группам по дням использования; долгохранящиеся (масло, мёд, орехи) — в первой группе на всю неделю. Для каждой позиции внизу — селектор упаковки с остатком/нехваткой.`;
   }
   const tb = document.getElementById('shopToolbar');
   // если активный трип-фильтр исчез после редактирования групп — сбрасываем
@@ -1708,16 +1729,26 @@ function renderShop() {
     for (const item of arr) {
       const checked = checks[item.fid] ? 'checked' : '';
       const qtyStr = item.qty >= 1000 ? (item.qty/1000).toFixed(2) + ' кг' : Math.round(item.qty) + 'г';
-      const tripTags = item.trips.map(tid => {
+      // Если выбрана группа — показываем только её тег. Иначе все группы продукта.
+      const visibleTrips = shopFilter.trip === 'all'
+        ? item.trips
+        : item.trips.filter(tid => tid === shopFilter.trip);
+      const tripTags = visibleTrips.map(tid => {
         const t = tripById(tid);
         const idx = TRIPS.findIndex(x => x.id === tid);
         const cls = idx > 0 ? `trip-i-${idx}` : 'trip';
         return `<span class="shop-tag ${cls}" title="${t?.name||tid}">${t?.icon||''} ${t?.name||tid}</span>`;
       }).join('');
       const usage = SHOP_USAGE[item.fid];
-      // фильтруем по текущему day-фильтру для уместности
+      // Фильтруем дни: при выбранной группе — только её дни; при выбранном дне — только он.
+      const allowedDays = shopFilter.day !== 'all'
+        ? [shopFilter.day]
+        : (shopFilter.trip !== 'all'
+            ? (tripById(shopFilter.trip)?.days || DAY_ORDER)
+            : DAY_ORDER);
+      const filteredDays = item.days.filter(d => allowedDays.includes(d));
       const visibleDishes = usage.dishes
-        .filter(u => shopFilter.day === 'all' || u.day === shopFilter.day)
+        .filter(u => allowedDays.includes(u.day))
         .sort((a,b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day));
       const usesPills = visibleDishes.map(u => {
         const sumG = u.lpG + u.isG;
@@ -1735,20 +1766,29 @@ function renderShop() {
           <div class="shop-item-name">${item.food.name}${item.food.unit?` <span style="font-size:11px;color:var(--ink-muted)">(${item.food.unit})</span>`:''}</div>
           <div class="shop-item-tags">
             ${tripTags}
-            ${item.days.map(d => `<span class="shop-tag day">${d}</span>`).join('')}
+            ${filteredDays.map(d => `<span class="shop-tag day">${d}</span>`).join('')}
           </div>
           ${visibleDishes.length ? `<button class="shop-item-uses-toggle" data-uses-toggle type="button" aria-expanded="false">▸ В каких блюдах (${visibleDishes.length})</button>
           <div class="shop-item-uses"><div class="shop-uses-list">${usesPills}</div></div>` : ''}
           ${(item.food.packs && item.food.packs.length) ? (() => {
             const pickedIdx = Math.min(packPick[item.fid] ?? 0, item.food.packs.length - 1);
             const pack = item.food.packs[pickedIdx];
-            const units = Math.ceil(item.qty / pack.size);
+            const need = Math.round(item.qty);
+            const units = Math.max(1, Math.ceil(item.qty / pack.size));
             const totalBought = units * pack.size;
+            const leftover = totalBought - need;
             const opts = item.food.packs.map((p, i) => `<option value="${i}" ${i===pickedIdx?'selected':''}>${p.label} (${p.size}г)</option>`).join('');
+            const leftoverHtml = leftover > 0
+              ? `<small style="color:var(--ink-muted);">остаток ${leftover}г</small>`
+              : leftover < 0
+                ? `<small style="color:var(--warn);">не хватает ${-leftover}г</small>`
+                : `<small style="color:var(--sage);">ровно</small>`;
             return `<div class="shop-pack">
               <span class="shop-pack-label">Упаковка:</span>
               <select data-pack-fid="${item.fid}" aria-label="Выбор упаковки">${opts}</select>
-              <span class="shop-pack-units">${units} шт <small>= ${totalBought}г (нужно ${Math.round(item.qty)}г)</small></span>
+              <span class="shop-pack-units">${units} шт = ${totalBought}г</span>
+              ${leftoverHtml}
+              <small style="color:var(--ink-muted); flex-basis:100%; margin-top:2px;">нужно ${need}г</small>
             </div>`;
           })() : ''}
         </div>
