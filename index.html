@@ -90,16 +90,16 @@ h3 { font-size: 18px; font-weight: 600; }
 .now-bar .now-go:hover { background: var(--accent-deep); }
 .now-bar .now-go[disabled] { background: var(--line); color: var(--ink-muted); cursor: default; }
 
-.meal.now-meal { box-shadow: 0 0 0 2px var(--gold), var(--shadow); margin-top: 16px; }
-.meal.now-meal .meal-header { position: relative; }
-.meal.now-meal .meal-header::before {
-  content: 'СЕЙЧАС';
-  position: absolute; top: -10px; left: 12px;
+.meal.now-meal { box-shadow: 0 0 0 2px var(--gold), var(--shadow); scroll-margin-top: 60px; }
+.meal { scroll-margin-top: 60px; }
+.now-badge {
+  display: inline-block;
   background: var(--gold); color: var(--bg-elev);
-  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
-  padding: 3px 8px; border-radius: 4px;
-  z-index: 2;
-  box-shadow: 0 1px 3px rgba(31,28,24,0.2);
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+  padding: 2px 7px; border-radius: 4px;
+  margin-right: 6px;
+  vertical-align: middle;
+  text-transform: uppercase;
 }
 
 .day-summary { background: var(--bg-elev); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--line-soft); }
@@ -1392,12 +1392,13 @@ function renderDay(d) {
     const isNow = (d === currentDayCode()) && (mid === currentMid());
     const nowCls = isNow ? ' now-meal open' : '';
     const ariaExp = isNow ? 'true' : 'false';
+    const nowBadge = isNow ? '<span class="now-badge">Сейчас</span>' : '';
 
     html += `
       <article class="meal${nowCls}" data-mid="${mid}">
         <header class="meal-header" role="button" tabindex="0" aria-expanded="${ariaExp}" aria-controls="meal-body-${mid}">
           <div class="meal-header-l">
-            <div class="meal-tag">${meal.type}${trainTag}</div>
+            <div class="meal-tag">${nowBadge}${meal.type}${trainTag}</div>
             <div class="meal-dishnames">${dishNames}</div>
             <div class="meal-totals-grid">
               <div class="meal-total-row">
