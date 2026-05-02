@@ -1,0 +1,3003 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>План питания · 7 дней</title>
+
+<!-- PWA / iOS web-app иконка -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#7d4a32">
+
+<!-- iOS: home-screen ярлык -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="План питания">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icon-167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+
+<!-- Стандартные favicon -->
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf7f2; --bg-elev: #fff; --bg-soft: #f3eee5;
+  --ink: #1f1c18; --ink-soft: #4a443c; --ink-muted: #8a8276;
+  --line: #e8e0d3; --line-soft: #f0e9dc;
+  --accent: #7d4a32; --accent-soft: #f5e3d8; --accent-deep: #5a3422;
+  --sage: #6b7a5a; --sage-soft: #e3e8d9;
+  --gold: #b88a3e; --warn: #c25a3a;
+  --shadow-sm: 0 1px 3px rgba(31,28,24,0.04);
+  --shadow: 0 2px 8px rgba(31,28,24,0.06);
+  --radius: 14px; --radius-sm: 10px;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; font-family: 'Inter', -apple-system, sans-serif; background: var(--bg);
+  color: var(--ink); font-size: 15px; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; letter-spacing: -0.01em; margin: 0; line-height: 1.15; }
+h1 { font-size: 30px; font-weight: 600; }
+h2 { font-size: 24px; }
+h3 { font-size: 18px; font-weight: 600; }
+
+.header { padding: 22px 18px 18px; background: var(--bg-elev); border-bottom: 1px solid var(--line); }
+.header-inner { max-width: 920px; margin: 0 auto; }
+.eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 6px; }
+.header h1 { margin-bottom: 8px; }
+.header-stats { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 13px; color: var(--ink-soft); }
+.header-stats b { color: var(--ink); font-weight: 600; }
+.header-stats .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); display: inline-block; opacity: 0.4; align-self: center; }
+
+.tabs-wrap { position: sticky; top: 0; background: rgba(250,247,242,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--line); z-index: 50; }
+.tabs { max-width: 920px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding: 0 8px; gap: 2px; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { flex-shrink: 0; padding: 14px 12px; background: none; border: none; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--ink-muted); cursor: pointer; position: relative; white-space: nowrap; min-height: 46px; }
+.tab.active { color: var(--accent); font-weight: 600; }
+.tab.active::after { content: ''; position: absolute; bottom: 0; left: 12px; right: 12px; height: 2px; background: var(--accent); border-radius: 2px 2px 0 0; }
+
+.content { max-width: 920px; margin: 0 auto; padding: 16px 14px 80px; }
+.panel { display: none; }
+.panel.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.days-nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding: 4px 0 12px; margin: 0 -14px 14px; padding-left: 14px; padding-right: 14px; }
+.days-nav::-webkit-scrollbar { display: none; }
+.day-btn { flex-shrink: 0; background: var(--bg-elev); border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; cursor: pointer; text-align: center; min-width: 60px; transition: all 0.18s; min-height: 56px; display: flex; flex-direction: column; justify-content: center; gap: 1px; }
+.day-btn .day-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--ink); line-height: 1; }
+.day-btn .day-tag { font-size: 13px; line-height: 1; margin-top: 3px; filter: grayscale(0.05); }
+.day-btn.train .day-tag { color: var(--accent); }
+.day-btn.rest .day-tag { color: var(--sage); }
+.day-btn.active { background: var(--ink); border-color: var(--ink); }
+.day-btn.active .day-name, .day-btn.active .day-tag { color: var(--bg-elev); }
+.day-btn.today { box-shadow: 0 0 0 2px var(--gold); position: relative; }
+.day-btn.today::before { content: '●'; position: absolute; top: 2px; right: 4px; color: var(--gold); font-size: 8px; line-height: 1; }
+.day-btn.today.active { box-shadow: 0 0 0 2px var(--gold); }
+
+/* Плашка «Сейчас» с кнопкой «к сегодня» */
+.now-bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin-bottom: 10px; background: var(--bg-elev); border-radius: var(--radius-sm); border: 1px solid var(--line-soft); font-size: 12px; color: var(--ink-soft); flex-wrap: wrap; }
+.now-bar .now-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+.now-bar b { color: var(--ink); font-weight: 600; }
+.now-bar .now-time { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.now-bar .now-go { margin-left: auto; background: var(--ink); color: var(--bg-elev); border: none; border-radius: 6px; padding: 6px 12px; font-family: inherit; font-size: 11.5px; font-weight: 600; cursor: pointer; min-height: 30px; }
+.now-bar .now-go:hover { background: var(--accent-deep); }
+.now-bar .now-go[disabled] { background: var(--line); color: var(--ink-muted); cursor: default; }
+
+.meal.now-meal { box-shadow: 0 0 0 2px var(--gold), var(--shadow); scroll-margin-top: 60px; }
+.meal { scroll-margin-top: 60px; }
+.now-badge {
+  display: inline-block;
+  background: var(--gold); color: var(--bg-elev);
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+  padding: 2px 7px; border-radius: 4px;
+  margin-right: 6px;
+  vertical-align: middle;
+  text-transform: uppercase;
+}
+
+.day-summary { background: var(--bg-elev); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--line-soft); }
+.day-summary-head { margin-bottom: 8px; }
+.day-summary h2 { display: inline; font-size: 22px; }
+.day-summary h2 small { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-left: 6px; padding: 2px 7px; border-radius: 5px; vertical-align: middle; }
+.day-summary h2 small.train { background: var(--accent-soft); color: var(--accent); }
+.day-summary h2 small.rest { background: var(--sage-soft); color: var(--sage); }
+.day-totals-grid { display: flex; flex-direction: column; gap: 6px; padding-top: 8px; border-top: 1px solid var(--line-soft); }
+.day-total-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; font-family: 'Inter', sans-serif; font-size: 12px; color: var(--ink-soft); }
+.day-total-row .who-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); min-width: 32px; text-align: center; }
+.day-total-row .who-label.is { background: var(--sage-soft); color: var(--sage); }
+.day-total-row .big { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--ink); line-height: 1; }
+.day-total-row .big small { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--ink-muted); font-weight: 500; margin-left: 3px; }
+.day-total-row .bju { color: var(--ink-soft); font-weight: 500; font-variant-numeric: tabular-nums; }
+.day-total-row .vs-target { display: inline-flex; align-items: baseline; gap: 5px; font-size: 11px; color: var(--ink-muted); font-variant-numeric: tabular-nums; padding: 2px 8px; border-radius: 5px; background: var(--bg-soft); border: 1px solid var(--line-soft); }
+.day-total-row .vs-target b { color: var(--ink); font-weight: 600; }
+.day-total-row .vs-target .delta { font-weight: 700; font-size: 12px; }
+.day-total-row .vs-target .delta.ok { color: var(--sage); }
+.day-total-row .vs-target .delta.warn { color: var(--warn); }
+.day-total-row .vs-target.ok { background: var(--sage-soft); border-color: var(--sage-soft); }
+.day-total-row .vs-target.warn { background: #fde8e2; border-color: #fde8e2; }
+
+/* MEAL CARD (collapsible) */
+.meal { background: var(--bg-elev); border-radius: var(--radius); margin-bottom: 10px; box-shadow: var(--shadow-sm); border: 1px solid var(--line-soft); overflow: hidden; }
+.meal-header { padding: 12px 14px; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 56px; }
+.meal-header:hover { background: var(--bg-soft); }
+.meal-header-l { flex: 1; min-width: 0; }
+.meal-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; margin-bottom: 2px; }
+.meal-tag .tag-train { background: var(--accent-soft); color: var(--accent); padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
+.meal-dishnames { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 500; color: var(--ink); line-height: 1.25; }
+.meal-dishnames .sep { color: var(--ink-muted); margin: 0 5px; opacity: 0.6; font-weight: 400; }
+.meal-header-r { display: flex; align-items: center; gap: 10px; }
+.meal-totals-grid { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); }
+.meal-total-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-family: 'Inter', sans-serif; font-size: 11.5px; color: var(--ink-soft); }
+.meal-total-row .who-label { font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); min-width: 28px; text-align: center; line-height: 1.5; }
+.meal-total-row .who-label.is { background: var(--sage-soft); color: var(--sage); }
+.meal-total-row .meal-kcal-num { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1; }
+.meal-total-row .meal-kcal-num small { font-family: 'Inter', sans-serif; font-size: 10px; color: var(--ink-muted); font-weight: 500; margin-left: 2px; }
+.meal-total-row .meal-bju { color: var(--ink-soft); font-variant-numeric: tabular-nums; font-size: 11.5px; }
+.meal-total-row .meal-weight { color: var(--ink-muted); font-variant-numeric: tabular-nums; font-size: 11px; flex-basis: 100%; margin-top: 2px; }
+.chev { width: 16px; height: 16px; transition: transform 0.2s; flex-shrink: 0; opacity: 0.5; }
+.meal.open .chev { transform: rotate(180deg); }
+.meal-body { display: none; border-top: 1px solid var(--line-soft); }
+.meal.open .meal-body { display: block; animation: fadeIn 0.25s ease; }
+
+/* DISH inside meal */
+.dish { padding: 14px 14px; border-bottom: 1px solid var(--line-soft); }
+.dish:last-child { border-bottom: none; }
+.dish-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+.dish-weight-hint { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.dish-icon { display: inline-block; font-size: 0.95em; margin-right: 2px; filter: grayscale(0.1); }
+
+.portions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.portion-card { padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--line-soft); background: var(--bg-soft); }
+.portion-card.lp { border-left: 3px solid var(--accent); }
+.portion-card.partner { border-left: 3px solid var(--sage); }
+.portion-who { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+.portion-card.lp .portion-who { color: var(--accent); }
+.portion-card.partner .portion-who { color: var(--sage); }
+.portion-kcal { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--ink); line-height: 1; margin-bottom: 4px; }
+.portion-kcal small { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-left: 3px; }
+.portion-bju { font-size: 11.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.portion-weight { font-size: 11px; color: var(--ink-muted); margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--line-soft); }
+
+.dish-section { margin-top: 10px; }
+.dish-section-title { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; margin-bottom: 6px; }
+.ing-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.ing-table th { text-align: left; font-size: 9px; font-weight: 600; color: var(--ink-muted); letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 4px 6px; border-bottom: 1px solid var(--line-soft); }
+.ing-table th.num { text-align: right; }
+.ing-table td { padding: 6px 4px; border-bottom: 1px dashed var(--line-soft); }
+.ing-table tr:last-child td { border-bottom: none; }
+.ing-table td.name { color: var(--ink); }
+.ing-table td.name a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent); cursor: pointer; }
+.ing-table td.num { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-soft); white-space: nowrap; }
+.ing-table tr.total td { font-weight: 600; background: var(--bg-soft); color: var(--ink); border-top: 1.5px solid var(--ink); border-bottom: none; padding: 7px 4px; font-size: 12.5px; }
+.ing-table tr.total td.name { font-style: italic; }
+/* Группы LP / IS / TTL — минималистичное разделение */
+.ing-table .group-head {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 4px 4px 2px;
+  background: none;
+  border-bottom: none;
+  color: var(--ink-muted);
+}
+.ing-table .group-head.lp  { color: var(--accent); }
+.ing-table .group-head.is  { color: var(--sage); }
+.ing-table .group-head.ttl { color: var(--ink-muted); font-size: 9px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.ing-table .group-start { border-left: 1px solid var(--line-soft); }
+.ing-table tr.total td.col-lp,
+.ing-table tr.total td.col-is,
+.ing-table tr.total td.col-ttl { background: var(--bg-soft); }
+
+.cook-steps { list-style: none; padding: 0; margin: 0; counter-reset: step; }
+.cook-steps li { padding: 8px 0 8px 32px; position: relative; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; counter-increment: step; border-bottom: 1px dashed var(--line-soft); }
+.cook-steps li:last-child { border-bottom: none; }
+.cook-steps li::before { content: counter(step); position: absolute; left: 0; top: 8px; width: 22px; height: 22px; background: var(--accent-soft); color: var(--accent); border-radius: 50%; font-family: 'Cormorant Garamond', serif; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+.dish-toolbar { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.dish-action { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 500; color: var(--ink-soft); cursor: pointer; min-height: 32px; }
+.dish-action:hover { background: var(--accent-soft); color: var(--accent); }
+
+/* KBJU PANEL */
+.kbju-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+.k-card { background: var(--bg-elev); padding: 14px; border-radius: var(--radius); border: 1px solid var(--line-soft); box-shadow: var(--shadow-sm); border-left: 3px solid var(--line); }
+.k-card.k-ok    { border-left-color: var(--sage);   background: linear-gradient(to right, rgba(107,122,90,0.06), var(--bg-elev) 30%); }
+.k-card.k-over  { border-left-color: var(--warn);   background: linear-gradient(to right, rgba(194,90,58,0.06), var(--bg-elev) 30%); }
+.k-card.k-under { border-left-color: var(--gold);   background: linear-gradient(to right, rgba(184,138,62,0.06), var(--bg-elev) 30%); }
+.k-card .label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; margin-bottom: 4px; }
+.k-card .value { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: var(--ink); line-height: 1; }
+.k-card .value small { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--ink-muted); font-weight: 500; }
+.k-card .k-delta { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.k-card.k-ok    .k-delta { color: var(--sage); }
+.k-card.k-over  .k-delta { color: var(--warn); }
+.k-card.k-under .k-delta { color: var(--gold); }
+.k-card .sub { font-size: 11px; color: var(--ink-muted); margin-top: 4px; }
+
+.kbju-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -14px; padding: 0 14px; }
+table.kbju-table { width: 100%; min-width: 540px; border-collapse: collapse; background: var(--bg-elev); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); font-size: 13px; border: 1px solid var(--line-soft); }
+table.kbju-table th, table.kbju-table td { padding: 10px 9px; text-align: left; border-bottom: 1px solid var(--line-soft); }
+table.kbju-table th { font-weight: 600; color: var(--ink-muted); background: var(--bg-soft); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+table.kbju-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.kbju-table td.day { font-weight: 600; color: var(--ink); }
+table.kbju-table td.delta { font-size: 11px; }
+table.kbju-table td.delta.ok { color: var(--sage); }
+table.kbju-table td.delta.warn { color: var(--warn); }
+table.kbju-table tr.total td { font-weight: 700; background: var(--accent-soft); color: var(--accent); border-top: 2px solid var(--accent); }
+table.kbju-table tr.avg td { background: var(--sage-soft); color: var(--sage); font-weight: 600; }
+
+.section-h { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 600; color: var(--ink); margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.section-h:first-child { margin-top: 6px; }
+
+/* SHOPPING */
+.shop-store-header { background: var(--bg-elev); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--line-soft); display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.shop-store-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; }
+.shop-store-name { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: var(--accent); line-height: 1; }
+.shop-store-name .shop-store-city { font-size: 16px; color: var(--ink-muted); font-weight: 400; font-style: italic; }
+.shop-info { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px; font-size: 13px; color: var(--accent-deep); }
+.shop-info b { font-weight: 700; }
+.shop-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; padding: 10px; background: var(--bg-elev); border-radius: var(--radius); border: 1px solid var(--line-soft); box-shadow: var(--shadow-sm); }
+.filter-btn { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; padding: 7px 11px; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--ink-soft); cursor: pointer; min-height: 36px; }
+.filter-btn:hover { background: var(--accent-soft); }
+.filter-btn.active { background: var(--ink); color: var(--bg-elev); border-color: var(--ink); }
+.filter-label { width: 100%; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; margin-top: 4px; margin-bottom: -2px; }
+.filter-label:first-child { margin-top: 0; }
+
+.shop-summary-line { font-size: 12px; color: var(--ink-soft); margin-bottom: 12px; padding: 8px 12px; background: var(--bg-soft); border-radius: var(--radius-sm); }
+.shop-summary-line b { color: var(--ink); }
+
+.shop-cat { background: var(--bg-elev); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow-sm); border: 1px solid var(--line-soft); }
+.shop-cat-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--line-soft); }
+.shop-cat-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: var(--ink); }
+.shop-cat-count { font-size: 11px; color: var(--ink-muted); }
+
+.shop-list { list-style: none; padding: 0; margin: 0; }
+.shop-item { display: flex; align-items: flex-start; padding: 9px 0; cursor: pointer; border-bottom: 1px dashed var(--line-soft); gap: 11px; user-select: none; min-height: 44px; }
+.shop-item:last-child { border-bottom: none; }
+.shop-check { width: 22px; height: 22px; border: 1.5px solid var(--ink-muted); border-radius: 6px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; transition: all 0.18s; margin-top: 1px; }
+.shop-item.checked .shop-check { background: var(--sage); border-color: var(--sage); }
+.shop-item.checked .shop-check::after { content: ''; width: 6px; height: 11px; border-right: 2px solid white; border-bottom: 2px solid white; transform: rotate(45deg) translate(-1px, -1px); }
+.shop-item-info { flex: 1; min-width: 0; }
+.shop-item-name { font-size: 14px; color: var(--ink); font-weight: 500; line-height: 1.3; }
+.shop-item-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+.shop-tag { font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: var(--bg-soft); color: var(--ink-soft); font-weight: 500; letter-spacing: 0.02em; }
+.shop-tag.day { background: var(--bg-soft); }
+.shop-tag.trip { background: var(--accent-soft); color: var(--accent); }
+/* Чередование оттенков для разных trip-id (до 6 групп) */
+.shop-tag.trip-i-1 { background: var(--sage-soft); color: var(--sage); }
+.shop-tag.trip-i-2 { background: #efe1f0; color: #7a3e8e; }
+.shop-tag.trip-i-3 { background: #e0eaf3; color: #2f5d87; }
+.shop-tag.trip-i-4 { background: #f5e9c9; color: #8a6a1c; }
+.shop-tag.trip-i-5 { background: #ffe2e2; color: #a04646; }
+.shop-item-qty { font-size: 13px; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
+.shop-item.checked .shop-item-name { text-decoration: line-through; color: var(--ink-muted); }
+.shop-item.hide { display: none; }
+.shop-item-uses-toggle { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--accent); cursor: pointer; margin-top: 6px; padding: 3px 0; background: none; border: none; font-family: inherit; font-weight: 600; }
+.shop-item-uses-toggle:hover { text-decoration: underline; }
+.shop-item-uses { display: none; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line-soft); }
+.shop-item-uses.open { display: block; animation: fadeIn 0.2s ease; }
+.shop-uses-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.shop-use-pill { display: inline-flex; align-items: center; gap: 4px; padding: 5px 9px; font-size: 11px; border-radius: 6px; background: var(--bg-soft); border: 1px solid var(--line); color: var(--ink); cursor: pointer; font-family: inherit; line-height: 1.3; }
+.shop-use-pill:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.shop-use-pill .pill-day { font-family: 'Cormorant Garamond', serif; font-weight: 700; }
+.shop-use-pill .pill-meta { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.dish.highlight { background: var(--accent-soft); transition: background 0.4s; }
+
+/* Pack picker */
+.shop-pack { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line-soft); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-soft); }
+.shop-pack-label { font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; }
+.shop-pack select { padding: 5px 8px; font-family: inherit; font-size: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg-elev); color: var(--ink); font-weight: 500; min-height: 30px; max-width: 200px; }
+.shop-pack-units { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.shop-pack-units small { font-weight: 500; color: var(--ink-muted); }
+
+/* PORTIONS */
+.portions-card { background: var(--bg-elev); padding: 14px; border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 12px; border: 1px solid var(--line-soft); }
+.field-label { display: block; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; margin-bottom: 7px; }
+.field { width: 100%; padding: 11px 13px; font-family: inherit; font-size: 15px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg-soft); color: var(--ink); appearance: none; -webkit-appearance: none; min-height: 44px; font-weight: 500; }
+.field-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8'%3E%3Cpath fill='none' stroke='%238a8276' stroke-width='1.5' d='M1 1l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+.field-num { text-align: center; font-variant-numeric: tabular-nums; font-weight: 600; }
+.portion-result { background: var(--bg-elev); padding: 14px; border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--line-soft); margin-bottom: 10px; }
+.portion-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; padding: 10px 12px; background: var(--bg-soft); border-radius: var(--radius-sm); font-size: 12px; color: var(--ink-soft); }
+.portion-meta span b { color: var(--ink); font-weight: 600; }
+.split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Ингредиентные карточки в Расчёте порций */
+.ing-card { background: var(--bg-elev); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+.ing-card-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed var(--line-soft); }
+.ing-card-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: var(--ink); }
+.ing-card-share { font-size: 11px; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.ing-card-share b { color: var(--ink); }
+.ing-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ing-row { padding: 8px 10px; border-radius: 6px; font-size: 12px; line-height: 1.4; }
+.ing-row.lp { background: rgba(125, 74, 50, 0.06); border-left: 3px solid var(--accent); }
+.ing-row.is { background: rgba(107, 122, 90, 0.07); border-left: 3px solid var(--sage); }
+.ing-row .who { font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.ing-row.lp .who { color: var(--accent); }
+.ing-row.is .who { color: var(--sage); }
+.ing-row .raw { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--ink); line-height: 1; margin-top: 3px; font-variant-numeric: tabular-nums; }
+.ing-row .raw small { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500; color: var(--ink-muted); margin-left: 2px; }
+.ing-row .meta { font-size: 11px; color: var(--ink-soft); margin-top: 3px; font-variant-numeric: tabular-nums; }
+.ing-row .actual { font-weight: 700; color: var(--accent); }
+.ing-row.is .actual { color: var(--sage); }
+.ing-cook-input { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 8px 10px; background: var(--bg-soft); border-radius: 6px; flex-wrap: wrap; }
+.ing-cook-input label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; }
+.ing-cook-input input { width: 90px; padding: 6px 10px; font-family: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--line); border-radius: 6px; background: var(--bg-elev); color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
+.ing-cook-input input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.ing-cook-input .reset { font-size: 10.5px; color: var(--ink-muted); cursor: pointer; background: none; border: none; font-family: inherit; padding: 4px 8px; border-radius: 4px; }
+.ing-cook-input .reset:hover { background: var(--bg-elev); color: var(--accent); }
+.ing-cook-input .hint { font-size: 11px; color: var(--ink-muted); }
+.ing-only-one { font-size: 11.5px; color: var(--ink-muted); padding: 6px 10px; background: var(--bg-soft); border-radius: 6px; }
+.unified-ings { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line-soft); display: flex; flex-direction: column; gap: 3px; }
+.unified-ing-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 11.5px; color: var(--ink-soft); padding: 2px 0; gap: 8px; }
+.unified-ing-row .ing-name { color: var(--ink); }
+.unified-ing-row .ing-grams { color: var(--ink-muted); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.portion-result-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.portion-result-head h3 { margin: 0; }
+.portion-jump-menu { font-size: 11.5px; padding: 6px 10px; min-height: 32px; }
+.portion-totals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.portion-totals .totals-card { padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--line-soft); }
+.portion-totals .totals-card.lp { background: var(--accent-soft); border-left: 3px solid var(--accent); }
+.portion-totals .totals-card.is { background: var(--sage-soft); border-left: 3px solid var(--sage); }
+.portion-totals .label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.portion-totals .totals-card.lp .label { color: var(--accent); }
+.portion-totals .totals-card.is .label { color: var(--sage); }
+.portion-totals .big { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: var(--ink); line-height: 1.1; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.portion-totals .big small { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--ink-muted); font-weight: 500; }
+.portion-totals .bju { font-size: 12px; color: var(--ink-soft); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.portion-totals .delta { font-size: 11px; margin-top: 4px; color: var(--ink-muted); }
+.portion-totals .delta.up { color: var(--accent); }
+.portion-totals .delta.down { color: var(--warn); }
+
+/* PREP */
+.prep-card { background: var(--bg-elev); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--line-soft); }
+.prep-when { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+.prep-card h3 { margin-bottom: 8px; }
+.prep-card p.intro { font-size: 13px; color: var(--ink-soft); margin-bottom: 12px; line-height: 1.5; }
+.prep-list { list-style: none; padding: 0; margin: 0; }
+.prep-item { padding: 8px 0; border-bottom: 1px dashed var(--line-soft); }
+.prep-item:last-child { border-bottom: none; padding-bottom: 0; }
+.prep-item-row { display: grid; grid-template-columns: minmax(120px,1.4fr) minmax(110px,auto) auto auto; gap: 10px; align-items: baseline; }
+.prep-item-name { font-weight: 600; color: var(--ink); font-size: 14px; }
+.prep-item-yield { font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.prep-item-yield b { color: var(--accent); font-weight: 700; }
+.prep-item-yield .ar { color: var(--ink-muted); margin: 0 2px; }
+.prep-item-days { display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
+.prep-item-time { font-size: 10.5px; color: var(--ink-muted); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+.prep-item-detail { font-size: 11.5px; color: var(--ink-muted); line-height: 1.4; margin-top: 4px; padding-left: 0; }
+@media (max-width: 600px) {
+  .prep-item-row { grid-template-columns: 1fr auto; row-gap: 4px; }
+  .prep-item-yield { grid-column: 1 / -1; }
+  .prep-item-days { grid-column: 1 / 2; }
+  .prep-item-time { grid-column: 2 / 3; }
+}
+.day-pill { display: inline-block; background: var(--bg-soft); padding: 2px 7px; border-radius: 4px; margin-right: 4px; margin-top: 3px; font-weight: 600; color: var(--ink); font-size: 10.5px; }
+
+/* Подсекции внутри карточки заготовки: Приготовить / Нарезать / Маринование */
+.prep-section { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line-soft); }
+.prep-section:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+.prep-section-title { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.prep-section-count { background: var(--accent-soft); color: var(--accent); padding: 1px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.prep-section-intro { font-size: 12px; color: var(--ink-soft); padding: 6px 10px; background: var(--bg-soft); border-radius: 6px; margin-bottom: 8px; line-height: 1.4; font-style: italic; }
+
+.tip { background: var(--bg-elev); border-left: 3px solid var(--gold); padding: 12px 14px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin: 14px 0; font-size: 13px; color: var(--ink-soft); line-height: 1.55; box-shadow: var(--shadow-sm); }
+.tip b { color: var(--ink); }
+
+/* PROFILE PANEL */
+.profile-card { background: var(--bg-elev); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow-sm); border: 1px solid var(--line-soft); }
+.profile-card-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line-soft); flex-wrap: wrap; }
+.profile-card-head h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; }
+.profile-card-head .badge { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; padding: 3px 8px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); }
+.profile-card-head .badge.is { background: var(--sage-soft); color: var(--sage); }
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.profile-field { display: flex; flex-direction: column; gap: 5px; }
+.profile-field label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; }
+.profile-field input { width: 100%; padding: 10px 12px; font-family: inherit; font-size: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg-soft); color: var(--ink); min-height: 40px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.profile-field input:focus { outline: 2px solid var(--accent); outline-offset: -1px; background: var(--bg-elev); }
+.profile-field .hint { font-size: 11px; color: var(--ink-muted); }
+.profile-targets { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.profile-targets .target-cell { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.profile-targets .target-cell label { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 600; color: var(--ink); }
+.profile-targets .target-cell input { width: 100%; padding: 8px 4px; text-align: center; font-size: 13px; font-variant-numeric: tabular-nums; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-soft); font-weight: 600; }
+.profile-targets .target-cell.train label { color: var(--accent); }
+.profile-targets .target-cell.rest label { color: var(--sage); }
+
+.trips-list { display: flex; flex-direction: column; gap: 10px; }
+.trip-card { padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg-soft); }
+.trip-card-head { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+.trip-card input.trip-name { flex: 1 1 120px; min-width: 0; padding: 8px 10px; font-size: 14px; font-weight: 600; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-elev); }
+.trip-card input.trip-icon { width: 48px; padding: 8px; text-align: center; font-size: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-elev); }
+.trip-card .trip-del { background: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 12px; color: var(--warn); cursor: pointer; }
+.trip-card .trip-del:hover { background: #fde8e2; }
+.trip-card .trip-days { display: flex; gap: 6px; flex-wrap: wrap; }
+.trip-day-chk { display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; background: var(--bg-elev); font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 600; user-select: none; min-height: 36px; }
+.trip-day-chk input { display: none; }
+.trip-day-chk.checked { background: var(--ink); color: var(--bg-elev); border-color: var(--ink); }
+.profile-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.btn-primary, .btn-ghost { font-family: inherit; font-size: 13px; font-weight: 600; padding: 9px 14px; border-radius: 8px; cursor: pointer; min-height: 38px; }
+.btn-primary { background: var(--ink); color: var(--bg-elev); border: 1px solid var(--ink); }
+.btn-primary:hover { background: var(--accent-deep); }
+.btn-ghost { background: var(--bg-soft); color: var(--ink-soft); border: 1px solid var(--line); }
+.btn-ghost:hover { background: var(--accent-soft); color: var(--accent); }
+.profile-warn { background: #fde8e2; border-left: 3px solid var(--warn); padding: 10px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 12.5px; color: var(--warn); margin-top: 10px; }
+
+/* Live-сводка плана и факта */
+.profile-summary { background: var(--bg-soft); border-radius: var(--radius-sm); padding: 10px 12px; margin: 10px 0; font-size: 12.5px; color: var(--ink-soft); border: 1px solid var(--line-soft); }
+.profile-summary .row { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: baseline; }
+.profile-summary .row + .row { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line-soft); }
+.profile-summary .pl-label { font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--ink-muted); }
+.profile-summary .pl-val { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; }
+.profile-summary .pl-val small { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; color: var(--ink-muted); }
+.profile-summary .pl-val.ok { color: var(--sage); }
+.profile-summary .pl-val.warn { color: var(--warn); }
+.profile-summary .pl-arrow { color: var(--ink-muted); }
+.profile-formula { font-size: 11.5px; color: var(--ink-muted); margin-top: 6px; font-style: italic; }
+
+/* Apply-блок: применить профиль к меню */
+.profile-apply { margin-top: 12px; padding: 12px 14px; background: var(--accent-soft); border-left: 3px solid var(--accent); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.profile-apply.is { background: var(--sage-soft); border-left-color: var(--sage); }
+.profile-apply-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+.profile-apply.is .profile-apply-title { color: var(--sage); }
+.profile-apply-text { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 8px; line-height: 1.45; }
+.profile-apply-text b { color: var(--ink); }
+.profile-apply-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.profile-apply-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 4px; background: var(--ink); color: var(--bg-elev); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.macro-scales { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.macro-scales .ms-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 10px; background: var(--bg-elev); border-radius: 6px; border: 1px solid var(--line-soft); font-size: 12px; }
+.macro-scales .ms-row.ok   { background: var(--sage-soft); border-color: var(--sage-soft); }
+.macro-scales .ms-row.warn { background: #fde8e2; border-color: #fde8e2; }
+.macro-scales .ms-label { color: var(--ink-soft); }
+.macro-scales .ms-label small { color: var(--ink-muted); font-weight: 500; margin-left: 4px; }
+.macro-scales .ms-val { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.macro-scales .ms-val small { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; color: var(--ink-muted); margin-left: 2px; }
+.macro-scales .ms-row.warn .ms-val { color: var(--warn); }
+
+/* Live-таблица «Цель vs Факт по дням» */
+.profile-live { margin-top: 12px; border: 1px solid var(--line-soft); border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-elev); }
+.profile-live-head { padding: 8px 12px; background: var(--bg-soft); border-bottom: 1px solid var(--line-soft); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+.profile-live-head .head-hint { font-size: 11px; letter-spacing: 0; text-transform: none; font-weight: 500; color: var(--ink-muted); }
+.profile-live table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.profile-live th, .profile-live td { padding: 7px 8px; text-align: right; font-variant-numeric: tabular-nums; border-bottom: 1px dashed var(--line-soft); }
+.profile-live th { font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; background: var(--bg-soft); border-bottom: 1px solid var(--line-soft); }
+.profile-live td.day { text-align: left; font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 600; color: var(--ink); }
+.profile-live td.day.train { color: var(--accent); }
+.profile-live td.day.rest { color: var(--sage); }
+.profile-live td.delta { font-weight: 600; }
+.profile-live td.delta.ok { color: var(--sage); }
+.profile-live td.delta.warn { color: var(--warn); }
+.profile-live tr:last-child td { border-bottom: none; }
+.profile-live tr.avg-row td { background: var(--bg-soft); font-weight: 700; color: var(--ink); border-top: 1.5px solid var(--ink); }
+
+/* Блок «Что меняется» — сворачиваемый */
+.profile-effects { margin-top: 12px; padding: 0; background: var(--bg-soft); border-radius: var(--radius-sm); border: 1px solid var(--line-soft); overflow: hidden; }
+.profile-effects-head { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; min-height: 44px; }
+.profile-effects-head:hover { background: var(--bg-elev); }
+.profile-effects-title { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; }
+.profile-effects-chev { width: 14px; height: 14px; opacity: 0.5; transition: transform 0.2s; }
+.profile-effects.open .profile-effects-chev { transform: rotate(180deg); }
+.profile-effects-body { display: none; padding: 0 14px 12px; }
+.profile-effects.open .profile-effects-body { display: block; animation: fadeIn 0.2s ease; }
+.profile-effects ul { margin: 0; padding: 0; list-style: none; padding-top: 4px; border-top: 1px dashed var(--line-soft); }
+.profile-effects li { padding: 5px 0; font-size: 12px; color: var(--ink-soft); border-bottom: 1px dashed var(--line-soft); display: flex; gap: 6px; }
+.profile-effects li:last-child { border-bottom: none; }
+.profile-effects li b { color: var(--ink); font-weight: 600; }
+.profile-effects li .arrow { color: var(--accent); font-weight: 700; flex-shrink: 0; }
+
+/* Переключатель профилей LP/IS */
+.profile-switch { display: flex; gap: 4px; padding: 4px; background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 10px; margin-bottom: 14px; }
+.profile-switch button { flex: 1; padding: 10px 14px; border: none; background: none; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--ink-muted); cursor: pointer; border-radius: 7px; min-height: 38px; transition: all 0.15s; letter-spacing: 0.05em; text-transform: uppercase; }
+.profile-switch button.active { background: var(--ink); color: var(--bg-elev); }
+.profile-switch button:not(.active):hover { background: var(--bg-elev); color: var(--ink); }
+
+/* Селект и radio-группа */
+.profile-radio-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.profile-radio { display: inline-flex; align-items: center; gap: 4px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; background: var(--bg-elev); font-size: 12.5px; font-weight: 500; min-height: 34px; user-select: none; }
+.profile-radio input { display: none; }
+.profile-radio.checked { background: var(--ink); color: var(--bg-elev); border-color: var(--ink); font-weight: 600; }
+.profile-targets-mode { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.profile-targets[data-mode="auto"] input { background: var(--bg-soft); color: var(--ink-muted); }
+
+@media (min-width: 768px) {
+  .header { padding: 32px 24px 24px; }
+  .header h1 { font-size: 38px; }
+  .content { padding: 24px 20px 80px; }
+  .kbju-cards { grid-template-columns: repeat(4, 1fr); }
+}
+
+.footer { text-align: center; padding: 28px 16px 20px; font-size: 12px; color: var(--ink-muted); border-top: 1px solid var(--line-soft); margin-top: 24px; }
+.footer em { color: var(--accent); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="eyebrow">7 дней</div>
+    <h1>План питания для двоих</h1>
+    <div class="header-stats" id="headerStats"></div>
+  </div>
+</header>
+
+<div class="tabs-wrap">
+  <div class="tabs" id="tabs" role="tablist">
+    <button class="tab active" data-panel="menu" role="tab" aria-selected="true" aria-controls="panel-menu" id="tab-menu">Меню</button>
+    <button class="tab" data-panel="kbju" role="tab" aria-selected="false" aria-controls="panel-kbju" id="tab-kbju">КБЖУ</button>
+    <button class="tab" data-panel="shop" role="tab" aria-selected="false" aria-controls="panel-shop" id="tab-shop">Закупки</button>
+    <button class="tab" data-panel="portions" role="tab" aria-selected="false" aria-controls="panel-portions" id="tab-portions">Расчёт порций</button>
+    <button class="tab" data-panel="prep" role="tab" aria-selected="false" aria-controls="panel-prep" id="tab-prep">Заготовки</button>
+    <button class="tab" data-panel="profile" role="tab" aria-selected="false" aria-controls="panel-profile" id="tab-profile">Профиль</button>
+  </div>
+</div>
+
+<main class="content">
+  <section class="panel active" id="panel-menu" role="tabpanel" aria-labelledby="tab-menu">
+    <div class="days-nav" id="daysNav"></div>
+    <div id="dayContent"></div>
+  </section>
+  <section class="panel" id="panel-kbju" role="tabpanel" aria-labelledby="tab-kbju">
+    <div class="kbju-cards" id="kbjuCards"></div>
+    <div class="section-h" id="kbjuLpTitle">LP — день за днём</div>
+    <div class="kbju-table-wrap"><table class="kbju-table" id="kbjuLP"></table></div>
+    <div class="section-h" id="kbjuIsTitle">IS — день за днём</div>
+    <div class="kbju-table-wrap"><table class="kbju-table" id="kbjuPartner"></table></div>
+    <div class="tip"><b>Все цифры считаются автоматически</b> из таблицы граммовок. Зелёная Δ = в коридоре цели (см. вкладку «Профиль»).</div>
+  </section>
+  <section class="panel" id="panel-shop" role="tabpanel" aria-labelledby="tab-shop">
+    <div class="shop-store-header">
+      <div class="shop-store-label">Магазин</div>
+      <div class="shop-store-name">ВкусВилл <span class="shop-store-city">· Москва</span></div>
+    </div>
+    <div class="shop-info" id="shopInfo"></div>
+    <div class="shop-toolbar" id="shopToolbar"></div>
+    <div class="shop-summary-line" id="shopSummary"></div>
+    <div id="shopContent"></div>
+  </section>
+  <section class="panel" id="panel-portions" role="tabpanel" aria-labelledby="tab-portions">
+    <div class="days-nav" id="portionDaysNav"></div>
+    <div class="portions-card" style="margin-bottom:10px;">
+      <label class="field-label" for="portionMealSelect">Приём пищи</label>
+      <select class="field field-select" id="portionMealSelect"></select>
+      <div class="tip" id="portionLogicTip" style="margin: 12px 0 0; background: var(--bg-soft); border-left-color: var(--accent);"></div>
+    </div>
+    <div id="portionResult"></div>
+  </section>
+  <section class="panel" id="panel-prep" role="tabpanel" aria-labelledby="tab-prep">
+    <div class="shop-toolbar" id="prepToolbar"></div>
+    <div id="prepContent"></div>
+  </section>
+  <section class="panel" id="panel-profile" role="tabpanel" aria-labelledby="tab-profile">
+    <div id="profileContent"></div>
+  </section>
+</main>
+
+<footer class="footer">
+  <em>Все цифры рассчитаны из единой базы продуктов и блюд · граммовки в сыром весе · никакого хардкода</em>
+</footer>
+
+<script>
+// =========================================================================
+// БАЗА ПРОДУКТОВ — КБЖУ на 100г
+// =========================================================================
+// packs — варианты упаковок ВкусВилл с граммовкой за шт. (приблизительные ВВ-форматы;
+// можно отредактировать вручную или выбрать в магазине). Первый pack — дефолт.
+// Свойства продукта (все опциональные кроме базовых):
+//   name, kcal, p, f, c — обязательны
+//   cat — категория для группировки в Закупках
+//   unit — текстовая подсказка штука/вес
+//   fresh — свежее мясо/рыба, в группу с днями использования
+//   perishable — зелень/свежие ягоды, тоже по дням использования
+//   lpOnly — не закупка (например, протеин)
+//   cookFactor — коэф варки: <1 теряет вес (мясо), >1 впитывает (крупа), 0 жидкость впитывается, 1 как сырое
+//   prep — рецепт заготовки: { kind: 'cooked'|'marinated', time, name, instruction, dryName?, cookedName? }
+//   packs — варианты упаковок ВкусВилла: [{size, label}], первый — дефолт
+const FOOD = {
+  tvorog0:    { name: 'Творог обезжиренный ВВ', kcal: 88,  p: 18,   f: 0.4, c: 3.3, cat: 'Молочка', perishable: true, packs: [{size:180,label:'180г'},{size:360,label:'2×180г'}] },
+  tvorogm:    { name: 'Творог мягкий 5% ВВ',    kcal: 122, p: 9,    f: 5,   c: 9,   cat: 'Молочка', perishable: true, packs: [{size:130,label:'130г'},{size:200,label:'200г'}] },
+  yogurt2:    { name: 'Греческий йогурт Teos 2%', kcal: 67,  p: 8,    f: 2,   c: 4.2, cat: 'Молочка', perishable: true, packs: [{size:250,label:'250г'},{size:500,label:'2×250г'}] },
+  tvorsyr:    { name: 'Творожный сыр лёгкий ВВ', kcal: 150, p: 6,    f: 12,  c: 4,   cat: 'Молочка', perishable: true, packs: [{size:140,label:'140г'}] },
+  mozarella:  { name: 'Моцарелла мини в рассоле ВВ', kcal: 240, p: 18,   f: 19,  c: 1,   cat: 'Молочка', perishable: true, packs: [{size:125,label:'125г'}] },
+  // Кокосовый «напиток» из 100% мякоти — концентрированные сливки. Разводить водой 1:3–1:4.
+  // КБЖУ хранятся как в плане (≈48 ккал/100г готовой жидкости после разведения). Если льёшь концентрат — учитывай ×3-4 ккал.
+  kokmoloko:  { name: 'Кокос. напиток (разведённый 1:3) ВВ', kcal: 48,  p: 1.5,  f: 2,   c: 6,   cat: 'Молочка', cookFactor: 1, packs: [{size:1000,label:'1л концентрата'}] },
+  yaytso:     { name: 'Яйцо С0 ВВ',             kcal: 157, p: 12.7, f: 11,  c: 0.7, cat: 'Молочка', unit: '1 шт ~70г', cookFactor: 0.90, packs: [{size:700,label:'10 шт ~70г'}] },
+
+  kurica:     { name: 'Филе грудки цыплёнка ВВ', kcal: 111.5, p: 23.6, f: 1.9, c: 0,   cat: 'Мясо/рыба', cookFactor: 0.75,
+    prep: { kind:'cooked', time:40, name:'Куриная грудка су-вид/аэрогриль',
+            instruction:'Промыть. Натереть смесью: соевый соус 30мл + паприка + чеснок + чёрный перец. Маринуется 15 мин. Аэрогриль 25 мин при 180°C, переворачивая каждые 8 мин.' },
+    packs: [{size:700,label:'~700г уп.'}] },
+  indeika:    { name: 'Филе индейки малое ВВ',   kcal: 105.5, p: 23, f: 1.5, c: 0,   cat: 'Мясо/рыба', cookFactor: 0.75,
+    prep: { kind:'cooked', time:30, name:'Стейки филе индейки',
+            instruction:'Нарезать стейками 100-110г. Маринад: соевый соус 20мл + чеснок + орегано + паприка, 10 мин. Аэрогриль 18 мин при 180°C, перевернуть на 9-й.' },
+    packs: [{size:750,label:'~750г уп.'}] },
+  semga:      { name: 'Сёмга филе на коже охл. ВВ', kcal: 200, p: 21,   f: 13,  c: 0,   cat: 'Мясо/рыба', fresh: true, cookFactor: 0.82,
+    packs: [{size:350,label:'~350г уп.'}] },
+  forel:      { name: 'Форель малосол. ломтики ВВ', kcal: 160, p: 19,   f: 9,   c: 0,   cat: 'Мясо/рыба',
+    packs: [{size:150,label:'150г'}] },
+  krevetki:   { name: 'Креветки аргент. дикие 40/60 ВВ', kcal: 62.5, p: 13.6, f: 0.9, c: 0, cat: 'Мясо/рыба', fresh: true, cookFactor: 0.82,
+    packs: [{size:500,label:'500г'}] },
+
+  zalivnoe:   { name: 'Заливное из индейки с хреном ВВ', kcal: 36, p: 8, f: 1, c: 0.5, cat: 'Готовое ВВ', packs: [{size:250,label:'250г'}] },
+  zapek:      { name: 'Запеканка творожная без сахара ВВ', kcal: 103, p: 8.4, f: 4.5, c: 7.2, cat: 'Готовое ВВ', packs: [{size:220,label:'220г'}] },
+  syrniki:    { name: 'Сырники запечённые ВВ', kcal: 175.5, p: 14, f: 3.5, c: 22, cat: 'Готовое ВВ', packs: [{size:600,label:'600г большая порция'}] },
+  sup:        { name: 'Суп «Куриный» с лапшой ВВ', kcal: 50, p: 3, f: 1.5, c: 6, cat: 'Готовое ВВ', packs: [{size:1000,label:'1кг'}] },
+  pyure:      { name: 'Картофельное пюре ВВ',   kcal: 90,  p: 2,    f: 3,   c: 14,  cat: 'Готовое ВВ', packs: [{size:500,label:'500г'}] },
+
+  ovsyanka:   { name: 'Геркулес овсяные хлопья ВВ', kcal: 352, p: 12, f: 6, c: 62, cat: 'Крупы', cookFactor: 3.0, packs: [{size:500,label:'500г'}] },
+  grechka:    { name: 'Гречка ядрица ВВ',       kcal: 313, p: 12.6, f: 3.3, c: 62,  cat: 'Крупы', cookFactor: 2.5,
+    prep: { kind:'cooked', time:25, dryName:'сухой', cookedName:'готовой', name:'Гречка отварная',
+            instruction:'Промыть. Мультиварка режим «крупа» с водой 1:2 + соль. Или кастрюля 20 мин на медленном огне.' },
+    packs: [{size:800,label:'800г'},{size:1000,label:'1кг'}] },
+  perlovka:   { name: 'Перловка ВВ',            kcal: 320, p: 9.3,  f: 1.1, c: 67,  cat: 'Крупы', cookFactor: 3.0,
+    prep: { kind:'cooked', time:40, dryName:'сухой', cookedName:'готовой', name:'Перловка отварная',
+            instruction:'Промыть, замочить минимум на 30 мин. Мультиварка «крупа» 35 мин с водой 1:3 + соль. Или варить 40 мин.' },
+    packs: [{size:500,label:'500г'},{size:800,label:'800г'}] },
+  risbasmati: { name: 'Рис басмати ВВ',         kcal: 350, p: 7,    f: 1,   c: 78,  cat: 'Крупы', cookFactor: 3.0, packs: [{size:500,label:'500г'},{size:1000,label:'1кг'}] },
+  chechevitsa:{ name: 'Чечевица красная ВВ',    kcal: 314, p: 24,   f: 1.5, c: 53,  cat: 'Крупы', cookFactor: 2.6,
+    prep: { kind:'cooked', time:15, dryName:'сухой', cookedName:'готовой', name:'Чечевица красная',
+            instruction:'Промыть, отварить 15 мин в подсоленной воде.' },
+    packs: [{size:400,label:'400г'},{size:800,label:'800г'}] },
+  hlebec:     { name: 'Хлебцы цельнозерн. ВВ',  kcal: 360, p: 11,   f: 3,   c: 65,  cat: 'Крупы', unit: '1 шт ~10г', packs: [{size:100,label:'100г уп. (~10 шт)'}] },
+
+  ogurec:     { name: 'Огурец ВВ',              kcal: 14,  p: 0.8,  f: 0.1, c: 2.5, cat: 'Овощи',
+    prep: { kind:'cut', time:5, name:'Огурец', instruction:'Кружочки или соломка.' },
+    packs: [{size:200,label:'~1 шт ~200г'},{size:500,label:'500г весовое'},{size:1000,label:'~1кг весовое'}] },
+  cherry:     { name: 'Томаты черри красные ВВ', kcal: 18, p: 0.9, f: 0.2, c: 3.9, cat: 'Овощи',
+    prep: { kind:'cut', time:3, name:'Помидоры черри', instruction:'Половинками.' },
+    packs: [{size:400,label:'400г'}] },
+  perec:      { name: 'Перец болгарский ВВ',    kcal: 27,  p: 1.3,  f: 0.3, c: 5,   cat: 'Овощи', cookFactor: 0.85,
+    prep: { kind:'cut', time:5, name:'Перец болгарский', instruction:'Удалить семена, соломка или кубик. Для запекания — сразу в контейнер с маринадом.' },
+    packs: [{size:350,label:'350г'}] },
+  kabachok:   { name: 'Кабачок ВВ',             kcal: 19,  p: 1.2,  f: 0.2, c: 3,   cat: 'Овощи', cookFactor: 0.80,
+    prep: { kind:'cut', time:5, name:'Кабачок', instruction:'Полукружия или кубик (лучше готовить сразу).' },
+    packs: [{size:600,label:'600г'}] },
+  shpinat:    { name: 'Салат Шпинат ВВ',        kcal: 23,  p: 2.9,  f: 0.4, c: 1.4, cat: 'Овощи', perishable: true, cookFactor: 0.50, packs: [{size:50,label:'50г уп.'}] },
+  luk:        { name: 'Лук репчатый ВВ',        kcal: 41,  p: 1.4,  f: 0.2, c: 8.2, cat: 'Овощи', cookFactor: 0.75, packs: [{size:400,label:'400г сетка'}] },
+
+  rukola:     { name: 'Салат Руккола ВВ',       kcal: 25,  p: 2.6,  f: 0.7, c: 2,   cat: 'Зелень', perishable: true, packs: [{size:50,label:'50г уп.'}] },
+  zelen:      { name: 'Микс укроп+петрушка ВВ', kcal: 36,  p: 3,    f: 0.5, c: 6,   cat: 'Зелень', perishable: true, packs: [{size:50,label:'50г пучок'}] },
+
+  golubika:   { name: 'Голубика свежая ВВ',     kcal: 39,  p: 1,    f: 0.5, c: 8,   cat: 'Ягоды/фрукты', perishable: true, packs: [{size:250,label:'250г'},{size:500,label:'500г'}] },
+  klubnika:   { name: 'Клубника свежая ВВ',     kcal: 32,  p: 0.7,  f: 0.3, c: 7,   cat: 'Ягоды/фрукты', perishable: true, packs: [{size:250,label:'250г'},{size:500,label:'500г'}] },
+  banan:      { name: 'Банан весовой ВВ',       kcal: 89,  p: 1.1,  f: 0.3, c: 23,  cat: 'Ягоды/фрукты', packs: [{size:150,label:'~1 шт'},{size:1000,label:'~1кг весовое'}] },
+  yabloko:    { name: 'Яблоко весовое ВВ',      kcal: 52,  p: 0.3,  f: 0.2, c: 14,  cat: 'Ягоды/фрукты', packs: [{size:180,label:'~1 шт'},{size:1000,label:'~1кг весовое'}] },
+
+  oilolive:   { name: 'Масло оливковое Extra Virgin ВВ', kcal: 884, p: 0, f: 100, c: 0, cat: 'Прочее', packs: [{size:250,label:'250мл'},{size:500,label:'500мл'},{size:1000,label:'1л'}] },
+  mindal:     { name: 'Миндаль ВВ',             kcal: 575, p: 21,   f: 49,  c: 22,  cat: 'Прочее', packs: [{size:150,label:'150г'},{size:300,label:'300г'}] },
+  orehgrec:   { name: 'Грецкий орех ВВ',        kcal: 654, p: 15,   f: 65,  c: 14,  cat: 'Прочее', packs: [{size:150,label:'150г'},{size:200,label:'200г'}] },
+  chia:       { name: 'Семена чиа ВВ',          kcal: 486, p: 17,   f: 31,  c: 42,  cat: 'Прочее', packs: [{size:150,label:'150г'},{size:250,label:'250г'}] },
+  len:        { name: 'Семена льна ВВ',         kcal: 534, p: 18,   f: 42,  c: 29,  cat: 'Прочее', packs: [{size:200,label:'200г'},{size:300,label:'300г'}] },
+  med:        { name: 'Мёд натуральный ВВ',     kcal: 304, p: 0.3,  f: 0,   c: 82,  cat: 'Прочее', packs: [{size:250,label:'250г'},{size:500,label:'500г'}] },
+  gorchica:   { name: 'Горчица дижонская ВВ',   kcal: 66,  p: 4,    f: 4,   c: 5,   cat: 'Прочее', packs: [{size:130,label:'130г'},{size:200,label:'200г'}] },
+  pesto:      { name: 'Песто ВВ',               kcal: 360, p: 6,    f: 35,  c: 4,   cat: 'Прочее', packs: [{size:90,label:'90г'},{size:140,label:'140г'}] },
+  shokoladd:  { name: 'Шоколад горький 72%+ ВВ', kcal: 580, p: 7,    f: 42,  c: 38,  cat: 'Прочее', packs: [{size:90,label:'90г плитка'},{size:100,label:'100г'}] },
+  protein:    { name: 'Протеин (изолят/казеин)',kcal: 360, p: 80,   f: 3,   c: 5,   cat: 'Прочее', lpOnly: true, packs: [{size:900,label:'900г банка'},{size:450,label:'450г'}] }
+};
+
+// =========================================================================
+// БЛЮДА — каждое имеет lp/partner граммовки + пошаговую готовку
+// =========================================================================
+const DISHES = {
+  // ПН
+  pn_b1: { name: 'Хлебцы с форелью и творожным сыром', unifiedCook: true,
+    lp: [['hlebec', 20], ['forel', 60], ['tvorsyr', 20], ['ogurec', 80], ['zelen', 10]],
+    partner: [['hlebec', 30], ['forel', 90], ['tvorsyr', 25], ['ogurec', 100], ['zelen', 10]],
+    cook: ['Хлебцы намазать творожным сыром тонким слоем.','Сверху выложить ломтики форели.','Добавить кружочки огурца и зелень.'] },
+  pn_b2: { name: 'Глазунья',
+    lp: [['yaytso', 55]],
+    partner: [['yaytso', 110]],
+    cook: ['Яйцо разбить в маленькую форму.','Аэрогриль 5 мин при 180°C до желаемой степени.'] },
+
+  pn_l1: { name: 'Курица с гречкой',
+    lp: [['kurica', 170], ['grechka', 50]],
+    partner: [['kurica', 250], ['grechka', 80], ['hlebec', 10]],
+    cook: ['Гречку отварить (или взять из заготовки).','Курицу запечь в аэрогриле 18 мин при 180°C (или разогреть из заготовки).','Полить соевым соусом, специи по вкусу.'] },
+  pn_l2: { name: 'Салат огурец-черри', unifiedCook: true,
+    lp: [['ogurec', 100], ['cherry', 80], ['oilolive', 5]],
+    partner: [['ogurec', 100], ['cherry', 100], ['oilolive', 5]],
+    cook: ['Огурец и черри нарезать.','Заправить оливковым маслом и лимонным соком, посолить.'] },
+
+  pn_s1: { name: 'Белковый перекус (post-tren)',
+    lp: [['protein', 15]],
+    partner: [['tvorogm', 130]],
+    cook: ['Варианты на выбор: <b>протеин</b> 25-30г в шейкере с 250мл воды/молока, ИЛИ <b>творог</b> 100-150г, ИЛИ <b>греческий йогурт</b> 200г.','LP — обычно протеин (post-tren). IS — творог.'] },
+  pn_s2: { name: 'Американо + банан с миндалём', unifiedCook: true,
+    lp: [['banan', 100], ['mindal', 10]],
+    partner: [['banan', 130], ['mindal', 20]],
+    cook: ['Сварить американо.','Банан нарезать или съесть целиком, миндаль рядом.'] },
+
+  pn_d: { name: 'Семга с овощами на рукколе',
+    lp: [['semga', 130], ['kabachok', 130], ['perec', 90], ['rukola', 30]],
+    partner: [['semga', 200], ['kabachok', 150], ['perec', 100], ['rukola', 30], ['hlebec', 10]],
+    cook: ['Семгу + овощи одновременно в аэрогриль 12 мин при 180°C.','Рукколу выложить на тарелку как подложку, сверху — семгу и овощи.','Полить лимонным соком, соевый соус по вкусу.'] },
+
+  // ВТ
+  vt_b: { name: 'Творожный боул с клубникой', unifiedCook: true,
+    lp: [['tvorog0', 220], ['klubnika', 100], ['yogurt2', 80], ['mindal', 10], ['len', 5], ['med', 5]],
+    partner: [['tvorog0', 320], ['klubnika', 130], ['yogurt2', 120], ['mindal', 20], ['len', 5], ['med', 10], ['hlebec', 20]],
+    cook: ['Творог выложить в пиалу.','Сверху добавить йогурт и клубнику.','Посыпать миндалём и льном, полить мёдом.'] },
+
+  vt_l1: { name: 'Заливное из индейки с горчицей', unifiedCook: true,
+    lp: [['zalivnoe', 180], ['gorchica', 5], ['hlebec', 20]],
+    partner: [['zalivnoe', 250], ['gorchica', 10], ['hlebec', 30]],
+    cook: ['Заливное нарезать ломтями.','Подать с дижонской горчицей и хлебцами.'] },
+  vt_l2: { name: 'Салат с рукколой и черри', unifiedCook: true,
+    lp: [['rukola', 50], ['cherry', 100], ['ogurec', 100], ['oilolive', 5]],
+    partner: [['rukola', 50], ['cherry', 120], ['ogurec', 100], ['oilolive', 7]],
+    cook: ['В миску — рукколу, черри половинками, огурец.','Заправить оливковым маслом, посолить.'] },
+
+  vt_s1: { name: 'Белковый перекус (post-tren)',
+    lp: [['protein', 20]],
+    partner: [['tvorogm', 130]],
+    cook: ['Варианты: протеин 25-30г в шейкере с 250мл воды/молока, ИЛИ творог 100-150г, ИЛИ йогурт 200г.','LP — протеин. IS — творог.'] },
+  vt_s2: { name: 'Американо + яблоко с грецким орехом', unifiedCook: true,
+    lp: [['yabloko', 150], ['orehgrec', 15]],
+    partner: [['yabloko', 180], ['orehgrec', 25]],
+    cook: ['Сварить американо.','Яблоко дольками, орех рядом.'] },
+
+  vt_d: { name: 'Курица с овощами аэрогриль',
+    lp: [['kurica', 170], ['kabachok', 100], ['perec', 85], ['luk', 25], ['zelen', 10]],
+    partner: [['kurica', 280], ['kabachok', 150], ['perec', 100], ['luk', 30], ['zelen', 10], ['hlebec', 30]],
+    cook: ['Овощи нарезать кубиком, лук кольцами.','Аэрогриль 12 мин при 180°C, перемешать в середине.','Курицу разогреть из заготовки (или приготовить с нуля 18 мин при 180°C), выложить сверху.','Соевый соус, специи, зелень.'] },
+
+  // СР
+  sr_b: { name: 'Сырники с йогуртом и голубикой', unifiedCook: true,
+    lp: [['syrniki', 150], ['yogurt2', 80], ['golubika', 80]],
+    partner: [['syrniki', 280], ['yogurt2', 120], ['golubika', 100], ['med', 10]],
+    cook: ['Сырники разогреть в аэрогриле 4 мин при 160°C.','Полить йогуртом, голубику сверху или рядом. IS — полить мёдом.'] },
+
+  sr_l1: { name: 'Куриный суп с лапшой',
+    lp: [['sup', 400], ['hlebec', 20]],
+    partner: [['sup', 500], ['hlebec', 30]],
+    cook: ['Суп разогреть в кастрюле или микроволновке.','Хлебцы рядом.'] },
+  sr_l2: { name: 'Мини-салат огурец-черри-руккола', unifiedCook: true,
+    lp: [['ogurec', 80], ['cherry', 80], ['rukola', 30], ['oilolive', 5]],
+    partner: [['ogurec', 100], ['cherry', 100], ['rukola', 30], ['oilolive', 7]],
+    cook: ['В миску — огурец, черри половинками, рукколу.','Заправить маслом, лимоном, посолить.'] },
+
+  sr_s: { name: 'Чай + хлебец с творожным сыром и ягодами', unifiedCook: true,
+    lp: [['hlebec', 10], ['tvorsyr', 25], ['golubika', 60]],
+    partner: [['hlebec', 20], ['tvorsyr', 35], ['golubika', 80]],
+    cook: ['Заварить чай.','Хлебец намазать творожным сыром.','Голубику сверху.'] },
+
+  sr_d1: { name: 'Стейк индейки с гречкой',
+    lp: [['indeika', 160], ['grechka', 30], ['zelen', 5]],
+    partner: [['indeika', 280], ['grechka', 80], ['zelen', 5]],
+    cook: ['Стейк индейки запечь в аэрогриле 18 мин при 180°C (или разогреть из заготовки).','Гречку отварить (или взять из заготовки).','Зелень мелко нарезать сверху.'] },
+  sr_d2: { name: 'Мини-салат', unifiedCook: true,
+    lp: [['ogurec', 80], ['cherry', 80], ['rukola', 30], ['oilolive', 5]],
+    partner: [['ogurec', 100], ['cherry', 100], ['rukola', 30], ['oilolive', 5]],
+    cook: ['Огурец и черри нарезать, добавить рукколу.','Заправить оливковым маслом, лимоном/бальзамиком, посолить.'] },
+
+  // ЧТ
+  ch_b: { name: 'Овсянка с чиа, кокосовым молоком и голубикой',
+    cookedTogether: ['ovsyanka', 'kokmoloko', 'chia'],
+    lp: [['ovsyanka', 50], ['kokmoloko', 180], ['chia', 5], ['golubika', 80], ['med', 5]],
+    partner: [['ovsyanka', 80], ['kokmoloko', 250], ['chia', 5], ['golubika', 100], ['med', 10], ['mindal', 15], ['banan', 50]],
+    cook: ['Овсянку и чиа залить кокосовым молоком в чашу мультиварки.','Включить режим «каша/молочная» на 15 мин. Или: залить кипящим молоком и накрыть на 10 мин.','Каша готова — поделить на порции.','Сверху положить голубику, мёд (IS — также банан и миндаль).'] },
+
+  ch_l1: { name: 'Курица с рисом басмати',
+    lp: [['kurica', 170], ['risbasmati', 40]],
+    partner: [['kurica', 230], ['risbasmati', 60]],
+    cook: ['Рис отварить.','Курицу разогреть из заготовки (или приготовить с нуля 18 мин при 180°C).','Полить соевым соусом.'] },
+  ch_l2: { name: 'Салат перец-огурец', unifiedCook: true,
+    lp: [['perec', 80], ['ogurec', 80], ['oilolive', 5]],
+    partner: [['perec', 100], ['ogurec', 100], ['hlebec', 10], ['oilolive', 5]],
+    cook: ['Перец и огурец нарезать соломкой или кубиком.','Заправить оливковым маслом, посолить.'] },
+
+  ch_s1: { name: 'Белковый перекус (post-tren)',
+    lp: [['protein', 25]],
+    partner: [['tvorogm', 130]],
+    cook: ['Варианты: протеин 25-30г в шейкере с 250мл воды/молока, ИЛИ творог 100-150г, ИЛИ йогурт 200г.','LP — протеин. IS — творог.'] },
+  ch_s2: { name: 'Американо + банан с миндалём', unifiedCook: true,
+    lp: [['banan', 80], ['mindal', 10]],
+    partner: [['banan', 130], ['mindal', 15]],
+    cook: ['Сварить американо.','Банан нарезать, миндаль рядом.'] },
+
+  ch_d1: { name: 'Семга с чечевицей',
+    lp: [['semga', 130], ['chechevitsa', 35]],
+    partner: [['semga', 180], ['chechevitsa', 40]],
+    cook: ['Чечевицу промыть, отварить 15 мин в подсоленной воде.','Семгу — в аэрогриль 12 мин при 180°C.','Семгу выложить на чечевицу, полить лимоном.'] },
+  ch_d2: { name: 'Салат с рукколой и черри', unifiedCook: true,
+    lp: [['rukola', 40], ['cherry', 80], ['oilolive', 4]],
+    partner: [['rukola', 40], ['cherry', 100], ['oilolive', 5]],
+    cook: ['Рукколу с черри выложить на тарелку.','Сбрызнуть оливковым маслом и солью.'] },
+
+  // ПТ
+  pt_b: { name: 'Запеканка творожная с йогуртом и клубникой', unifiedCook: true,
+    lp: [['zapek', 200], ['yogurt2', 80], ['klubnika', 80]],
+    partner: [['zapek', 300], ['yogurt2', 100], ['klubnika', 100], ['hlebec', 10]],
+    cook: ['Запеканку разогреть: микроволновка 30 сек или аэрогриль 4 мин при 150°C.','Полить йогуртом.','Клубнику нарезать сверху.'] },
+
+  pt_l1: { name: 'Курица с гречкой',
+    lp: [['kurica', 170], ['grechka', 60]],
+    partner: [['kurica', 250], ['grechka', 80]],
+    cook: ['Гречку отварить (или взять из заготовки).','Курицу разогреть из заготовки (или приготовить с нуля 18 мин при 180°C).','Полить соевым соусом.'] },
+  pt_l2: { name: 'Кабачок аэрогриль с черри', unifiedCook: true,
+    lp: [['kabachok', 100], ['cherry', 80], ['oilolive', 5]],
+    partner: [['kabachok', 130], ['cherry', 100], ['oilolive', 5]],
+    cook: ['Кабачок нарезать полукружиями, в аэрогриль 10 мин при 180°C.','Черри добавить сырыми перед подачей.','Полить оливковым маслом, посолить.'] },
+
+  pt_s1: { name: 'Белковый перекус (post-tren)',
+    lp: [['protein', 15]],
+    partner: [['tvorogm', 130]],
+    cook: ['Варианты: протеин 25-30г в шейкере с 250мл воды/молока, ИЛИ творог 100-150г, ИЛИ йогурт 200г.','LP — протеин. IS — творог.'] },
+  pt_s2: { name: 'Американо + яблоко с миндалём', unifiedCook: true,
+    lp: [['yabloko', 150], ['mindal', 10]],
+    partner: [['yabloko', 180], ['mindal', 20]],
+    cook: ['Сварить американо.','Яблоко дольками, миндаль рядом.'] },
+
+  pt_d: { name: 'Стейк индейки с овощами на шпинате',
+    lp: [['indeika', 140], ['perec', 100], ['kabachok', 100], ['luk', 25], ['shpinat', 30], ['oilolive', 5]],
+    partner: [['indeika', 210], ['perec', 130], ['kabachok', 130], ['luk', 30], ['shpinat', 30], ['oilolive', 5]],
+    cook: ['Овощи + лук — аэрогриль 12 мин при 180°C.','Стейк индейки запечь 18 мин при 180°C (или разогреть из заготовки).','Шпинат полить оливковым маслом — это салатная подложка.','Сверху овощи и индейку, соевый соус, специи.'] },
+
+  // СБ
+  sb_b: { name: 'Омлет с овощами и творожным сыром + хлебец',
+    cookedTogether: ['yaytso', 'cherry', 'perec', 'shpinat', 'tvorsyr'],
+    lp: [['yaytso', 165], ['cherry', 100], ['perec', 60], ['shpinat', 30], ['tvorsyr', 20], ['hlebec', 20]],
+    partner: [['yaytso', 220], ['cherry', 130], ['perec', 80], ['shpinat', 30], ['tvorsyr', 30], ['hlebec', 30]],
+    cook: ['Овощи мелко нарезать, шпинат порвать руками.','Яйца взбить вилкой, добавить овощи.','Вылить в форму, сверху ломтики творожного сыра.','Аэрогриль 12 мин при 170°C. Хлебец рядом.'] },
+
+  sb_l: { name: 'Салат с креветками, моцареллой и песто', unifiedCook: true,
+    lp: [['krevetki', 180], ['mozarella', 80], ['rukola', 50], ['shpinat', 30], ['cherry', 120], ['ogurec', 80], ['pesto', 15]],
+    partner: [['krevetki', 250], ['mozarella', 120], ['rukola', 50], ['shpinat', 30], ['cherry', 130], ['ogurec', 100], ['pesto', 20]],
+    cook: ['Креветки разморозить, обсушить.','Натереть чесноком и паприкой, в аэрогриль 6 мин при 180°C.','В миску — рукколу, шпинат, черри половинками, огурец.','Сверху — креветки и моцареллу. Полить песто.'] },
+
+  sb_s: { name: 'Американо + горький шоколад + клубника', unifiedCook: true,
+    lp: [['shokoladd', 20], ['klubnika', 80]],
+    partner: [['shokoladd', 30], ['klubnika', 130]],
+    cook: ['Сварить американо.','Шоколад дольками, клубнику рядом.'] },
+
+  sb_d: { name: 'Стейк индейки с перловкой',
+    lp: [['indeika', 140], ['perlovka', 40], ['kabachok', 100], ['cherry', 80]],
+    partner: [['indeika', 210], ['perlovka', 70], ['kabachok', 130], ['cherry', 100]],
+    cook: ['Перловку отварить (35 мин, можно заранее или взять из заготовки).','Кабачок — аэрогриль 10 мин при 180°C.','Стейк индейки запечь 18 мин при 180°C (или разогреть из заготовки).','Собрать на тарелке: перловка, индейка, кабачок, черри сверху.'] },
+
+  // ВС
+  vs_b: { name: 'Овсянка с бананом, голубикой и миндалём',
+    cookedTogether: ['ovsyanka', 'kokmoloko'],
+    lp: [['ovsyanka', 50], ['kokmoloko', 200], ['banan', 60], ['golubika', 80], ['mindal', 10], ['med', 5]],
+    partner: [['ovsyanka', 70], ['kokmoloko', 250], ['banan', 80], ['golubika', 100], ['mindal', 15], ['med', 10]],
+    cook: ['Овсянку залить кокосовым молоком в мультиварке. Режим «каша» 15 мин.','Каша готова — поделить на порции.','Сверху положить банан, голубику, миндаль, мёд.'] },
+
+  vs_l1: { name: 'Семга с рисом басмати',
+    lp: [['semga', 120], ['risbasmati', 50]],
+    partner: [['semga', 160], ['risbasmati', 70]],
+    cook: ['Рис отварить.','Семгу — аэрогриль 12 мин при 180°C.','Полить лимоном, соевым соусом по вкусу.'] },
+  vs_l2: { name: 'Перец и кабачок аэрогриль', unifiedCook: true,
+    lp: [['perec', 100], ['kabachok', 100]],
+    partner: [['perec', 130], ['kabachok', 130]],
+    cook: ['Овощи нарезать кубиком.','В аэрогриль 12 мин при 180°C.','Соевый соус, специи.'] },
+
+  vs_s1: { name: 'Белковый перекус',
+    lp: [['protein', 20]],
+    partner: [['tvorogm', 130]],
+    cook: ['Варианты: протеин 25-30г в шейкере с 250мл воды/молока, ИЛИ творог 100-150г, ИЛИ йогурт 200г.','LP — протеин. IS — творог.'] },
+  vs_s2: { name: 'Чай + хлебец с творожным сыром и клубникой', unifiedCook: true,
+    lp: [['hlebec', 10], ['tvorsyr', 25], ['klubnika', 80]],
+    partner: [['hlebec', 20], ['tvorsyr', 35], ['klubnika', 130], ['mindal', 15]],
+    cook: ['Заварить чай.','Хлебец намазать творожным сыром, клубнику сверху или рядом.','IS — миндаль рядом.'] },
+
+  vs_d1: { name: 'Заливное с пюре и горчицей', unifiedCook: true,
+    lp: [['zalivnoe', 200], ['pyure', 150], ['gorchica', 5]],
+    partner: [['zalivnoe', 250], ['pyure', 200], ['gorchica', 10]],
+    cook: ['Заливное нарезать ломтями.','Пюре разогреть в микроволновке 1 мин или в кастрюле.','Подать с дижонской горчицей.'] },
+  vs_d2: { name: 'Овощной салат с рукколой', unifiedCook: true,
+    lp: [['ogurec', 100], ['cherry', 80], ['rukola', 40], ['oilolive', 3]],
+    partner: [['ogurec', 100], ['cherry', 100], ['rukola', 40], ['oilolive', 5]],
+    cook: ['Огурец и черри нарезать, добавить рукколу.','Заправить маслом, посолить.'] }
+};
+
+// =========================================================================
+// ПРИЁМЫ — состоят из блюд
+// =========================================================================
+const MEALS = {
+  pn_b:  { day: 'Пн', type: 'Завтрак', dishes: ['pn_b1', 'pn_b2'] },
+  pn_l:  { day: 'Пн', type: 'Обед', train: 'pre', dishes: ['pn_l1', 'pn_l2'] },
+  pn_s1: { day: 'Пн', type: 'Перекус', train: 'post', dishes: ['pn_s1'] },
+  pn_s2: { day: 'Пн', type: 'Перекус', dishes: ['pn_s2'] },
+  pn_d:  { day: 'Пн', type: 'Ужин', dishes: ['pn_d'] },
+
+  vt_b:  { day: 'Вт', type: 'Завтрак', dishes: ['vt_b'] },
+  vt_l:  { day: 'Вт', type: 'Обед', train: 'pre', dishes: ['vt_l1', 'vt_l2'] },
+  vt_s1: { day: 'Вт', type: 'Перекус', train: 'post', dishes: ['vt_s1'] },
+  vt_s2: { day: 'Вт', type: 'Перекус', dishes: ['vt_s2'] },
+  vt_d:  { day: 'Вт', type: 'Ужин', dishes: ['vt_d'] },
+
+  sr_b:  { day: 'Ср', type: 'Завтрак', dishes: ['sr_b'] },
+  sr_l:  { day: 'Ср', type: 'Обед', dishes: ['sr_l1', 'sr_l2'] },
+  sr_s:  { day: 'Ср', type: 'Перекус', dishes: ['sr_s'] },
+  sr_d:  { day: 'Ср', type: 'Ужин', dishes: ['sr_d1', 'sr_d2'] },
+
+  ch_b:  { day: 'Чт', type: 'Завтрак', dishes: ['ch_b'] },
+  ch_l:  { day: 'Чт', type: 'Обед', train: 'pre', dishes: ['ch_l1', 'ch_l2'] },
+  ch_s1: { day: 'Чт', type: 'Перекус', train: 'post', dishes: ['ch_s1'] },
+  ch_s2: { day: 'Чт', type: 'Перекус', dishes: ['ch_s2'] },
+  ch_d:  { day: 'Чт', type: 'Ужин', dishes: ['ch_d1', 'ch_d2'] },
+
+  pt_b:  { day: 'Пт', type: 'Завтрак', dishes: ['pt_b'] },
+  pt_l:  { day: 'Пт', type: 'Обед', train: 'pre', dishes: ['pt_l1', 'pt_l2'] },
+  pt_s1: { day: 'Пт', type: 'Перекус', train: 'post', dishes: ['pt_s1'] },
+  pt_s2: { day: 'Пт', type: 'Перекус', dishes: ['pt_s2'] },
+  pt_d:  { day: 'Пт', type: 'Ужин', dishes: ['pt_d'] },
+
+  sb_b:  { day: 'Сб', type: 'Завтрак', dishes: ['sb_b'] },
+  sb_l:  { day: 'Сб', type: 'Обед', dishes: ['sb_l'] },
+  sb_s:  { day: 'Сб', type: 'Перекус', dishes: ['sb_s'] },
+  sb_d:  { day: 'Сб', type: 'Ужин', dishes: ['sb_d'] },
+
+  vs_b:  { day: 'Вс', type: 'Завтрак', dishes: ['vs_b'] },
+  vs_l:  { day: 'Вс', type: 'Обед', dishes: ['vs_l1', 'vs_l2'] },
+  vs_s1: { day: 'Вс', type: 'Перекус', dishes: ['vs_s1'] },
+  vs_s2: { day: 'Вс', type: 'Перекус', dishes: ['vs_s2'] },
+  vs_d:  { day: 'Вс', type: 'Ужин', dishes: ['vs_d1', 'vs_d2'] }
+};
+
+const DAYS = {
+  'Пн': { code: 'pn', type: 'train', label: 'Тренировка', meals: ['pn_b','pn_l','pn_s1','pn_s2','pn_d'] },
+  'Вт': { code: 'vt', type: 'train', label: 'Тренировка', meals: ['vt_b','vt_l','vt_s1','vt_s2','vt_d'] },
+  'Ср': { code: 'sr', type: 'rest',  label: 'Отдых',      meals: ['sr_b','sr_l','sr_s','sr_d'] },
+  'Чт': { code: 'ch', type: 'train', label: 'Тренировка', meals: ['ch_b','ch_l','ch_s1','ch_s2','ch_d'] },
+  'Пт': { code: 'pt', type: 'train', label: 'Тренировка', meals: ['pt_b','pt_l','pt_s1','pt_s2','pt_d'] },
+  'Сб': { code: 'sb', type: 'rest',  label: 'Отдых',      meals: ['sb_b','sb_l','sb_s','sb_d'] },
+  'Вс': { code: 'vs', type: 'rest',  label: 'Отдых',      meals: ['vs_b','vs_l','vs_s1','vs_s2','vs_d'] }
+};
+const DAY_ORDER = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+
+// =========================================================================
+// ПРОФИЛИ LP и IS — редактируются на вкладке «Профиль», сохраняются в localStorage
+// Цепочка вычислений:
+//   targetKcal = tdee + goalKcal (goalKcal: <0 — дефицит, 0 — поддержание, >0 — профицит)
+//   protein g/day = weight × proteinPerKg
+//   fat g/day     = (targetKcal × fatPercent / 100) / 9
+//   carbs g/day   = (targetKcal − protein×4 − fat×9) / 4
+//   dailyTargets:
+//     auto — все дни = targetKcal (или train/rest распределение по trainPct/restPct)
+//     manual — пользовательские числа в targets[day]
+// =========================================================================
+const DEFAULT_PROFILE = {
+  lp: {
+    name: 'LP', weight: 80, tdee: 2300,
+    goal: 'cut', goalKcal: -1000,
+    proteinPerKg: 1.5, fatPercent: 30,
+    targetMode: 'auto', trainPct: 105, restPct: 100,
+    deltaTol: 50,
+    autoScale: true,                  // меню автоматически масштабируется под цель
+    targets: { 'Пн':1365,'Вт':1365,'Ср':1300,'Чт':1365,'Пт':1365,'Сб':1300,'Вс':1300 }
+  },
+  is: {
+    name: 'IS', weight: 80, tdee: 2350,
+    goal: 'bulk', goalKcal: 200,
+    proteinPerKg: 1.85, fatPercent: 30,
+    targetMode: 'auto', trainPct: 100, restPct: 100,
+    deltaTol: 50,
+    autoScale: true,
+    targets: { 'Пн':2550,'Вт':2550,'Ср':2550,'Чт':2550,'Пт':2550,'Сб':2550,'Вс':2550 }
+  }
+};
+let PROFILE; // инициализируется в init() через loadProfile()
+function loadProfile() {
+  const stored = Store.get('profileV1', null);
+  const merge = (def, st) => ({ ...def, ...(st||{}), targets: { ...def.targets, ...((st||{}).targets||{}) } });
+  if (stored && stored.lp && stored.is) {
+    PROFILE = { lp: merge(DEFAULT_PROFILE.lp, stored.lp), is: merge(DEFAULT_PROFILE.is, stored.is) };
+  } else {
+    PROFILE = JSON.parse(JSON.stringify(DEFAULT_PROFILE));
+  }
+}
+function saveProfile() { Store.set('profileV1', PROFILE); }
+
+// Вычисленные значения профиля
+function profileTargetKcal(p) { return Math.round(p.tdee + p.goalKcal); }
+function profileTargetMacros(p) {
+  const kcal = profileTargetKcal(p);
+  const proteinG = Math.round(p.weight * p.proteinPerKg);
+  const fatG = Math.round((kcal * (p.fatPercent / 100)) / 9);
+  const carbsKcal = kcal - proteinG * 4 - fatG * 9;
+  const carbsG = Math.max(0, Math.round(carbsKcal / 4));
+  return { kcal, proteinG, fatG, carbsG, proteinKcal: proteinG*4, fatKcal: fatG*9, carbsKcal: Math.max(0, carbsKcal) };
+}
+// Возвращает цель ккал на конкретный день (из targets если manual, иначе авто из train/restPct)
+function profileDailyTarget(p, day) {
+  if (p.targetMode === 'manual') return p.targets[day] || 0;
+  const base = profileTargetKcal(p);
+  const isTrain = DAYS[day]?.type === 'train';
+  const pct = isTrain ? (p.trainPct ?? 100) : (p.restPct ?? 100);
+  return Math.round(base * pct / 100);
+}
+
+// =========================================================================
+// ГРУППЫ ЗАКУПОК — мультиселект дней; редактируются на вкладке «Профиль»
+// =========================================================================
+const DEFAULT_TRIPS = [
+  { id: 'mon-tue', name: 'Пн - Вт', icon: '🛒', days: ['Пн','Вт'] },
+  { id: 'wed-thu', name: 'Ср - Чт', icon: '🥬', days: ['Ср','Чт'] },
+  { id: 'fri-sun', name: 'Пт - Вс', icon: '🧺', days: ['Пт','Сб','Вс'] }
+];
+
+let TRIPS;
+function loadTrips() {
+  const stored = Store.get('tripsV1', null);
+  TRIPS = Array.isArray(stored) && stored.length ? stored : JSON.parse(JSON.stringify(DEFAULT_TRIPS));
+}
+function saveTrips() { Store.set('tripsV1', TRIPS); }
+
+// =========================================================================
+// КАЛЬКУЛЯТОРЫ
+// =========================================================================
+// Готовый вес продукта = сырой × FOOD[fid].cookFactor (если задан, иначе 1.0)
+function cookedWeight(fid, raw) {
+  const f = FOOD[fid]?.cookFactor;
+  return f == null ? raw : raw * f;
+}
+
+// =========================================================================
+// АВТОМАСШТАБИРОВАНИЕ МЕНЮ под цель профиля.
+// Когда profile.autoScale=true, граммовки человека умножаются на коэффициент
+// scale = profile.targetKcal / originalAvgKcal(who).
+// Исходные DISHES не трогаются — масштабирование вычисляется на лету.
+// =========================================================================
+const ORIGINAL_AVG_KCAL = { lp: null, partner: null };
+function getOriginalAvgKcal(who) {
+  if (ORIGINAL_AVG_KCAL[who] != null) return ORIGINAL_AVG_KCAL[who];
+  let week = 0;
+  for (const day of DAY_ORDER) {
+    for (const mid of DAYS[day].meals) {
+      const meal = MEALS[mid]; if (!meal) continue;
+      for (const did of meal.dishes) {
+        const dish = DISHES[did]; if (!dish) continue;
+        const ings = dish[who] || [];
+        for (const [fid, g] of ings) {
+          const food = FOOD[fid]; if (!food) continue;
+          week += food.kcal * g / 100;
+        }
+      }
+    }
+  }
+  return ORIGINAL_AVG_KCAL[who] = week / 7;
+}
+
+// Средняя цель ккал/день с учётом train/rest % или ручных значений
+function profileAvgDailyTarget(p) {
+  let week = 0;
+  for (const d of DAY_ORDER) week += profileDailyTarget(p, d);
+  return week / 7;
+}
+
+// Классификация продукта по ведущему макро (для multi-macro scaling)
+function foodClass(food) {
+  const kP = (food.p||0) * 4, kF = (food.f||0) * 9, kC = (food.c||0) * 4;
+  const tot = kP + kF + kC;
+  if (tot < 5) return 'X'; // практически нулевой по всем макро
+  const fP = kP/tot, fF = kF/tot, fC = kC/tot;
+  if (fP >= 0.5) return 'P';
+  if (fF >= 0.55) return 'F';
+  if (fC >= 0.55) return 'C';
+  return 'M'; // mixed
+}
+
+// Кэшируемый расчёт исходных (без масштаба) сумм по неделе по группам
+const ORIG_BY_CLASS = { lp: null, partner: null };
+function getOrigByClass(who) {
+  if (ORIG_BY_CLASS[who]) return ORIG_BY_CLASS[who];
+  const init = () => ({ kcal: 0, p: 0, f: 0, c: 0 });
+  const acc = { P: init(), F: init(), C: init(), M: init(), X: init() };
+  for (const day of DAY_ORDER) {
+    for (const mid of DAYS[day].meals) {
+      const meal = MEALS[mid]; if (!meal) continue;
+      for (const did of meal.dishes) {
+        const dish = DISHES[did]; if (!dish) continue;
+        for (const [fid, g] of (dish[who] || [])) {
+          const food = FOOD[fid]; if (!food) continue;
+          const cls = foodClass(food);
+          acc[cls].kcal += food.kcal * g / 100;
+          acc[cls].p    += food.p    * g / 100;
+          acc[cls].f    += food.f    * g / 100;
+          acc[cls].c    += food.c    * g / 100;
+        }
+      }
+    }
+  }
+  for (const k of Object.keys(acc)) {
+    acc[k].kcal /= 7; acc[k].p /= 7; acc[k].f /= 7; acc[k].c /= 7;
+  }
+  return ORIG_BY_CLASS[who] = acc;
+}
+
+// Решение системы 3×3: A·s = b методом Крамера. Возвращает [sP, sF, sC].
+function solve3x3(A, b) {
+  const det = (m) =>
+    m[0][0]*(m[1][1]*m[2][2] - m[1][2]*m[2][1])
+   -m[0][1]*(m[1][0]*m[2][2] - m[1][2]*m[2][0])
+   +m[0][2]*(m[1][0]*m[2][1] - m[1][1]*m[2][0]);
+  const D = det(A);
+  if (Math.abs(D) < 1e-9) return null;
+  const colReplace = (M, col, vec) => M.map((r, i) => r.map((v, j) => j === col ? vec[i] : v));
+  return [det(colReplace(A,0,b))/D, det(colReplace(A,1,b))/D, det(colReplace(A,2,b))/D];
+}
+
+// Раздельные scale-коэффициенты по группам P/F/C — чтобы факт совпал с целью БЖУ
+function profileMacroScales(p) {
+  if (!p.autoScale) return { P:1, F:1, C:1, M:1 };
+  const who = p === PROFILE.lp ? 'lp' : 'partner';
+  const o = getOrigByClass(who);
+  const m = profileTargetMacros(p);
+  // Скейл нацеливается на среднюю дневную цель — поэтому в targetKcal приводим к среднему по дням
+  const avgTarget = profileAvgDailyTarget(p);
+  const kcalScale = m.kcal > 0 ? avgTarget / m.kcal : 1;
+  const tP = m.proteinG * kcalScale, tF = m.fatG * kcalScale, tC = m.carbsG * kcalScale;
+  // Mixed-источники не масштабируются — добавляются в фикс. часть. X (масло, мёд и т.п.) тоже фиксируем.
+  const fixedP = o.M.p + o.X.p, fixedF = o.M.f + o.X.f, fixedC = o.M.c + o.X.c;
+  // Уравнения: sP·o.P.X + sF·o.F.X + sC·o.C.X = tX − fixedX
+  const A = [
+    [o.P.p, o.F.p, o.C.p],
+    [o.P.f, o.F.f, o.C.f],
+    [o.P.c, o.F.c, o.C.c],
+  ];
+  const b = [tP - fixedP, tF - fixedF, tC - fixedC];
+  const s = solve3x3(A, b);
+  if (!s) return { P:1, F:1, C:1, M:1 };
+  // Clamp: 0.3..3.0 — защита от нелепых значений
+  const clamp = (x) => Math.max(0.3, Math.min(3.0, x));
+  return { P: clamp(s[0]), F: clamp(s[1]), C: clamp(s[2]), M: 1, X: 1 };
+}
+
+// Возвращает [[fid, g], ...] с учётом раздельного масштабирования по макро-группам
+function dishIng(did, who) {
+  const base = DISHES[did]?.[who] || [];
+  const p = who === 'lp' ? PROFILE.lp : PROFILE.is;
+  if (!p.autoScale) return base;
+  const scales = profileMacroScales(p);
+  return base.map(([fid, g]) => {
+    const food = FOOD[fid];
+    if (!food) return [fid, g];
+    const cls = foodClass(food);
+    const s = scales[cls] ?? 1;
+    return [fid, Math.max(g > 0 ? 1 : 0, Math.round(g * s))];
+  });
+}
+
+// Совместимость со старыми вызовами (debug-индикатор «×коэф» в Профиле)
+function profileScale(p) {
+  if (!p.autoScale) return 1;
+  const who = p === PROFILE.lp ? 'lp' : 'partner';
+  const orig = getOriginalAvgKcal(who);
+  if (orig <= 0) return 1;
+  return profileAvgDailyTarget(p) / orig;
+}
+
+// Сбросить кэши (вызывается при изменении DISHES/FOOD; здесь — при сбросе профилей)
+function invalidateOriginCaches() {
+  ORIGINAL_AVG_KCAL.lp = null; ORIGINAL_AVG_KCAL.partner = null;
+  ORIG_BY_CLASS.lp = null;     ORIG_BY_CLASS.partner = null;
+}
+// Иконка блюда: берётся из dish.icon, либо подбирается эвристикой по составу/названию.
+// Чтобы переопределить — добавь icon: '🐟' прямо в DISHES[did].
+function dishIcon(did) {
+  const dish = DISHES[did];
+  if (!dish) return '';
+  if (dish.icon) return dish.icon;
+  const name = (dish.name || '').toLowerCase();
+  const fids = new Set([...(dish.lp||[]), ...(dish.partner||[])].map(([fid]) => fid));
+  // По названию/ключевым словам
+  if (/глазунь|омлет|яичниц/.test(name)) return '🍳';
+  if (/салат|руккол/.test(name)) return '🥗';
+  if (/сырник|запеканк/.test(name)) return '🥞';
+  if (/суп/.test(name)) return '🍲';
+  if (/боул|овсянк|каш/.test(name)) return '🥣';
+  if (/шейк|белков/.test(name)) return '🥛';
+  if (/кофе|американо|чай/.test(name)) return '☕';
+  if (/шоколад/.test(name)) return '🍫';
+  if (/хлебец|бутер/.test(name)) return '🥪';
+  if (/пюре/.test(name)) return '🥔';
+  if (/заливн/.test(name)) return '🥩';
+  // По продуктам
+  if (fids.has('krevetki')) return '🦐';
+  if (fids.has('semga') || fids.has('forel')) return '🐟';
+  if (fids.has('kurica') || fids.has('indeika')) return '🍗';
+  if (fids.has('yaytso')) return '🍳';
+  if (fids.has('protein') || fids.has('tvorog0')) return '🥛';
+  if (fids.has('shokoladd')) return '🍫';
+  if (fids.has('grechka') || fids.has('ovsyanka') || fids.has('perlovka') || fids.has('risbasmati') || fids.has('chechevitsa')) return '🥣';
+  if (fids.has('kabachok') || fids.has('perec') || fids.has('ogurec') || fids.has('cherry') || fids.has('rukola')) return '🥗';
+  return '🍴';
+}
+
+function calcIng(fid, g) {
+  const f = FOOD[fid];
+  return { kcal: f.kcal*g/100, p: f.p*g/100, f: f.f*g/100, c: f.c*g/100, weight: g, cooked: cookedWeight(fid, g) };
+}
+function calcList(list) {
+  let r = { kcal: 0, p: 0, f: 0, c: 0, weight: 0, cooked: 0 };
+  for (const [fid, g] of list) {
+    const ic = calcIng(fid, g);
+    r.kcal += ic.kcal; r.p += ic.p; r.f += ic.f; r.c += ic.c; r.weight += g; r.cooked += ic.cooked;
+  }
+  return r;
+}
+function calcDish(did, who = 'lp') {
+  return calcList(dishIng(did, who));
+}
+function calcMeal(mid, who = 'lp') {
+  let r = { kcal: 0, p: 0, f: 0, c: 0, weight: 0, cooked: 0 };
+  for (const did of MEALS[mid].dishes) {
+    const c = calcDish(did, who);
+    r.kcal += c.kcal; r.p += c.p; r.f += c.f; r.c += c.c; r.weight += c.weight; r.cooked += c.cooked;
+  }
+  return r;
+}
+function calcDay(d, who = 'lp') {
+  let r = { kcal: 0, p: 0, f: 0, c: 0, weight: 0, cooked: 0 };
+  for (const mid of DAYS[d].meals) {
+    const c = calcMeal(mid, who);
+    r.kcal += c.kcal; r.p += c.p; r.f += c.f; r.c += c.c; r.weight += c.weight; r.cooked += c.cooked;
+  }
+  return r;
+}
+function calcWeek(who = 'lp') {
+  let r = { kcal: 0, p: 0, f: 0, c: 0 };
+  for (const d of DAY_ORDER) {
+    const c = calcDay(d, who);
+    r.kcal += c.kcal; r.p += c.p; r.f += c.f; r.c += c.c;
+  }
+  return r;
+}
+function fmt(x, d = 0) { return Number(x).toFixed(d); }
+function fmtDelta(n) { return n === 0 ? '0' : (n > 0 ? `+${n}` : `${n}`); }
+
+// Текущий день недели в нашей нотации Пн/Вт/...
+const JS_DAY_TO_RU = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+function currentDayCode(date = new Date()) {
+  return JS_DAY_TO_RU[date.getDay()];
+}
+// Текущий приём пищи по часу:
+//  00:00–10:59 → Завтрак · 11:00–14:59 → Обед · 15:00–16:59 → Перекус · 17:00–23:59 → Ужин
+function currentMealType(date = new Date()) {
+  const h = date.getHours();
+  if (h < 11) return 'Завтрак';
+  if (h < 15) return 'Обед';
+  if (h < 17) return 'Перекус';
+  return 'Ужин';
+}
+// Mid текущего приёма (первый MEAL текущего дня с подходящим type)
+function currentMid(date = new Date()) {
+  const day = currentDayCode(date);
+  const type = currentMealType(date);
+  const meals = DAYS[day]?.meals || [];
+  return meals.find(mid => MEALS[mid]?.type === type) || null;
+}
+
+// Плашка «Сейчас» — индикатор текущего дня/приёма + кнопка возврата
+// context: 'menu' (для вкладки Меню) или 'portion' (для Расчёта порций)
+function buildNowBar(context, selectedDay, selectedMid) {
+  const now = new Date();
+  const day = currentDayCode(now);
+  const type = currentMealType(now);
+  const mid = currentMid(now);
+  const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const onTarget = (selectedDay === day) && (mid ? selectedMid === mid : true);
+  const dataAttr = context === 'menu' ? 'data-now-go-menu' : 'data-now-go-portion';
+  return `<div class="now-bar">
+    <span class="now-dot" aria-hidden="true"></span>
+    <span>Сейчас: <b>${day}</b> · <b>${type}</b></span>
+    <span class="now-time">${t}</span>
+    <button class="now-go" ${dataAttr} type="button" ${onTarget?'disabled':''} title="Перейти к сегодняшнему дню и текущему приёму">${onTarget?'✓ открыто':'→ к сегодня'}</button>
+  </div>`;
+}
+function dayIcon(type) { return type === 'train' ? '💪' : '🌿'; }
+
+// Безопасный доступ к localStorage (приватный режим / отключённое хранилище)
+const Store = {
+  get(key, fallback) {
+    try {
+      const v = localStorage.getItem(key);
+      return v == null ? fallback : JSON.parse(v);
+    } catch { return fallback; }
+  },
+  set(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  }
+};
+
+// =========================================================================
+// HEADER
+// =========================================================================
+function renderHeader() {
+  const lp = calcWeek('lp');
+  const p = calcWeek('partner');
+  const trainDays = DAY_ORDER.filter(d => DAYS[d].type === 'train').join('/');
+  document.getElementById('headerStats').innerHTML = `
+    <span>${PROFILE.lp.name} <b>~${fmt(lp.kcal/7)} ккал</b></span>
+    <span class="dot"></span>
+    <span>${PROFILE.is.name} <b>~${fmt(p.kcal/7)} ккал</b></span>
+    <span class="dot"></span>
+    <span>Силовые <b>${trainDays||'—'}</b></span>
+  `;
+}
+
+// =========================================================================
+// MENU PANEL
+// =========================================================================
+let currentDay = currentDayCode();
+function renderDaysNav() {
+  const nav = document.getElementById('daysNav');
+  nav.innerHTML = '';
+  const today = currentDayCode();
+  DAY_ORDER.forEach((d) => {
+    const day = DAYS[d];
+    const isToday = d === today;
+    const btn = document.createElement('button');
+    btn.className = `day-btn ${day.type}` + (d === currentDay ? ' active' : '') + (isToday ? ' today' : '');
+    btn.dataset.day = d;
+    btn.title = (isToday ? 'Сегодня · ' : '') + day.label;
+    btn.innerHTML = `<span class="day-name">${d}</span><span class="day-tag" title="${day.label}">${dayIcon(day.type)}</span>`;
+    btn.onclick = () => { currentDay = d; renderDaysNav(); renderDay(d); };
+    nav.appendChild(btn);
+  });
+}
+
+function renderDay(d) {
+  const day = DAYS[d];
+  const tLP = calcDay(d, 'lp');
+  const tP = calcDay(d, 'partner');
+  const cont = document.getElementById('dayContent');
+
+  // Дельта к цели — видимая связь с Профилем
+  const lpTarget = profileDailyTarget(PROFILE.lp, d);
+  const isTarget = profileDailyTarget(PROFILE.is, d);
+  const lpDelta = Math.round(tLP.kcal - lpTarget);
+  const isDelta = Math.round(tP.kcal - isTarget);
+  const lpOk = Math.abs(lpDelta) <= PROFILE.lp.deltaTol;
+  const isOk = Math.abs(isDelta) <= PROFILE.is.deltaTol;
+  const lpVs = lpTarget ? `<span class="vs-target ${lpOk?'ok':'warn'}">цель <b>${lpTarget}</b> · <span class="delta ${lpOk?'ok':'warn'}">${fmtDelta(lpDelta)}</span> ккал</span>` : '';
+  const isVs = isTarget ? `<span class="vs-target ${isOk?'ok':'warn'}">цель <b>${isTarget}</b> · <span class="delta ${isOk?'ok':'warn'}">${fmtDelta(isDelta)}</span> ккал</span>` : '';
+
+  let html = `
+    ${buildNowBar('menu', d, null)}
+    <div class="day-summary">
+      <div class="day-summary-head">
+        <h2>${d} <small class="${day.type}" title="${day.label}">${dayIcon(day.type)}</small></h2>
+      </div>
+      <div class="day-totals-grid">
+        <div class="day-total-row lp-row">
+          <span class="who-label">${PROFILE.lp.name}</span>
+          <span class="big">${fmt(tLP.kcal)}<small>ккал</small></span>
+          <span class="bju">Б ${fmt(tLP.p,0)} · Ж ${fmt(tLP.f,0)} · У ${fmt(tLP.c,0)}</span>
+          ${lpVs}
+        </div>
+        <div class="day-total-row is-row">
+          <span class="who-label is">${PROFILE.is.name}</span>
+          <span class="big">${fmt(tP.kcal)}<small>ккал</small></span>
+          <span class="bju">Б ${fmt(tP.p,0)} · Ж ${fmt(tP.f,0)} · У ${fmt(tP.c,0)}</span>
+          ${isVs}
+        </div>
+      </div>
+    </div>
+  `;
+
+  for (const mid of day.meals) {
+    const meal = MEALS[mid];
+    const mLP = calcMeal(mid, 'lp');
+    const mP = calcMeal(mid, 'partner');
+    const dishNames = meal.dishes.map(did => `<span class="dish-icon">${dishIcon(did)}</span> ${DISHES[did].name}`).join(' <span class="sep">·</span> ');
+    const trainTag = meal.train === 'pre' ? '<span class="tag-train">⤴ пред-трен</span>'
+                    : meal.train === 'post' ? '<span class="tag-train">⤵ пост-трен</span>' : '';
+    const isNow = (d === currentDayCode()) && (mid === currentMid());
+    const nowCls = isNow ? ' now-meal open' : '';
+    const ariaExp = isNow ? 'true' : 'false';
+    const nowBadge = isNow ? '<span class="now-badge">Сейчас</span>' : '';
+
+    html += `
+      <article class="meal${nowCls}" data-mid="${mid}">
+        <header class="meal-header" role="button" tabindex="0" aria-expanded="${ariaExp}" aria-controls="meal-body-${mid}">
+          <div class="meal-header-l">
+            <div class="meal-tag">${nowBadge}${meal.type}${trainTag}</div>
+            <div class="meal-dishnames">${dishNames}</div>
+            <div class="meal-totals-grid">
+              <div class="meal-total-row">
+                <span class="who-label">${PROFILE.lp.name}</span>
+                <span class="meal-kcal-num">${fmt(mLP.kcal)}<small>ккал</small></span>
+                <span class="meal-bju">Б ${fmt(mLP.p,0)} · Ж ${fmt(mLP.f,0)} · У ${fmt(mLP.c,0)}</span>
+                <span class="meal-weight">${fmt(mLP.weight)}г сыр · ~${fmt(mLP.cooked)}г готов</span>
+              </div>
+              <div class="meal-total-row">
+                <span class="who-label is">${PROFILE.is.name}</span>
+                <span class="meal-kcal-num">${fmt(mP.kcal)}<small>ккал</small></span>
+                <span class="meal-bju">Б ${fmt(mP.p,0)} · Ж ${fmt(mP.f,0)} · У ${fmt(mP.c,0)}</span>
+                <span class="meal-weight">${fmt(mP.weight)}г сыр · ~${fmt(mP.cooked)}г готов</span>
+              </div>
+            </div>
+          </div>
+          <div class="meal-header-r">
+            <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </header>
+        <div class="meal-body" id="meal-body-${mid}">
+    `;
+
+    for (const did of meal.dishes) {
+      const dish = DISHES[did];
+      const dLP = calcDish(did, 'lp');
+      const dP = calcDish(did, 'partner');
+
+      html += `
+        <div class="dish" data-dish-id="${did}">
+          <div class="dish-name"><span class="dish-icon">${dishIcon(did)}</span> ${dish.name} <span class="dish-weight-hint">${fmt(dLP.weight)}г / ${fmt(dP.weight)}г сыр${Math.abs(dLP.cooked-dLP.weight)>0.5||Math.abs(dP.cooked-dP.weight)>0.5?` · ~${fmt(dLP.cooked)}г / ${fmt(dP.cooked)}г готов`:''}</span></div>
+
+          <div class="dish-section">
+            <div class="dish-section-title">Состав на блюдо</div>
+            <table class="ing-table">
+              <thead>
+                <tr>
+                  <th rowspan="2">Ингредиент</th>
+                  <th colspan="2" class="group-head lp group-start">${PROFILE.lp.name}</th>
+                  <th colspan="2" class="group-head is group-start">${PROFILE.is.name}</th>
+                  <th rowspan="2" class="group-head ttl group-start">TTL сыр</th>
+                </tr>
+                <tr>
+                  <th class="num group-start col-lp">сыр</th>
+                  <th class="num col-lp">ккал</th>
+                  <th class="num group-start col-is">сыр</th>
+                  <th class="num col-is">ккал</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${(() => {
+                  const lpIngs = dishIng(did, 'lp');
+                  const partIngs = dishIng(did, 'partner');
+                  const all = new Set();
+                  lpIngs.forEach(([id]) => all.add(id));
+                  partIngs.forEach(([id]) => all.add(id));
+                  return [...all].map(id => {
+                    const lpG = (lpIngs.find(x => x[0] === id) || [id, 0])[1];
+                    const pG = (partIngs.find(x => x[0] === id) || [id, 0])[1];
+                    const lpKcal = lpG ? FOOD[id].kcal * lpG / 100 : 0;
+                    const pKcal = pG ? FOOD[id].kcal * pG / 100 : 0;
+                    const totalRaw = lpG + pG;
+                    return `<tr>
+                      <td class="name"><a data-shop-fid="${id}">${FOOD[id].name}</a></td>
+                      <td class="num group-start col-lp">${lpG || '—'}</td>
+                      <td class="num col-lp">${lpG ? fmt(lpKcal) : '—'}</td>
+                      <td class="num group-start col-is">${pG || '—'}</td>
+                      <td class="num col-is">${pG ? fmt(pKcal) : '—'}</td>
+                      <td class="num group-start col-ttl">${totalRaw}</td>
+                    </tr>`;
+                  }).join('');
+                })()}
+                <tr class="total">
+                  <td class="name">Итого блюдо</td>
+                  <td class="num group-start col-lp">${fmt(dLP.weight)}</td>
+                  <td class="num col-lp">${fmt(dLP.kcal)}</td>
+                  <td class="num group-start col-is">${fmt(dP.weight)}</td>
+                  <td class="num col-is">${fmt(dP.kcal)}</td>
+                  <td class="num group-start col-ttl">${fmt(dLP.weight + dP.weight)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="dish-section">
+            <div class="dish-section-title">Готовка</div>
+            <ol class="cook-steps">
+              ${dish.cook.map(s => `<li>${s}</li>`).join('')}
+            </ol>
+          </div>
+
+          <div class="dish-toolbar">
+            <button class="dish-action" data-portion-did="${did}">→ Расчёт порций</button>
+          </div>
+        </div>
+      `;
+    }
+
+    html += `</div></article>`;
+  }
+
+  cont.innerHTML = html;
+
+  // По умолчанию все приёмы свёрнуты — пользователь раскрывает кликом
+
+  // Toggle (мышь + клавиатура)
+  const toggleMeal = (h) => {
+    const open = h.parentElement.classList.toggle('open');
+    h.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+  cont.querySelectorAll('.meal-header').forEach(h => {
+    h.onclick = () => toggleMeal(h);
+    h.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMeal(h); }
+    };
+  });
+
+  // Кнопка «к сегодня» — переключает на текущий день и скроллит к текущему приёму
+  cont.querySelectorAll('[data-now-go-menu]').forEach(btn => {
+    btn.onclick = () => {
+      currentDay = currentDayCode();
+      renderDaysNav();
+      renderDay(currentDay);
+      setTimeout(() => {
+        const cur = currentMid();
+        const m = cur ? document.querySelector(`.meal[data-mid="${cur}"]`) : null;
+        (m || document.querySelector('.now-bar'))?.scrollIntoView({ behavior:'smooth', block:'start' });
+      }, 50);
+    };
+  });
+
+  // Переход на закупки — сбрасываем фильтры, чтобы продукт точно отрисовался
+  cont.querySelectorAll('[data-shop-fid]').forEach(a => {
+    a.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const fid = a.dataset.shopFid;
+      shopFilter = { day: 'all', trip: 'all' };
+      renderShopToolbar();
+      renderShop();
+      switchTo('shop');
+      setTimeout(() => {
+        const t = document.getElementById('shop-' + fid);
+        if (t) {
+          t.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          t.style.background = 'var(--accent-soft)';
+          setTimeout(() => t.style.background = '', 1500);
+        }
+      }, 100);
+    };
+  });
+
+  // Переход на расчёт порций — выставляем день и нужный приём по did
+  cont.querySelectorAll('[data-portion-did]').forEach(b => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      const did = b.dataset.portionDid;
+      // найти приём, который содержит это блюдо
+      const found = Object.entries(MEALS).find(([, m]) => m.dishes.includes(did));
+      if (found) {
+        const [mid, meal] = found;
+        portionDay = meal.day;
+        portionMid = mid;
+      }
+      renderPortionDaysNav();
+      renderPortionMealSelect();
+      switchTo('portions');
+      renderPortion();
+      // прокрутить к нужному блюду
+      setTimeout(() => {
+        const target = document.querySelector(`#portionResult [data-did="${did}"]`)?.closest('.portion-result');
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    };
+  });
+}
+
+// =========================================================================
+// KBJU PANEL
+// =========================================================================
+function buildKbjuTable(who, profile) {
+  const totals = { kcal:0, p:0, f:0, c:0 };
+  let h = '<thead><tr><th>День</th><th>Тип</th><th class="num">Ккал</th><th class="num">Цель</th><th class="num">Δ</th><th class="num">Б</th><th class="num">Ж</th><th class="num">У</th></tr></thead><tbody>';
+  for (const d of DAY_ORDER) {
+    const t = calcDay(d, who);
+    const day = DAYS[d];
+    const target = profileDailyTarget(profile, d);
+    const delta = Math.round(t.kcal - target);
+    const ok = Math.abs(delta) <= profile.deltaTol;
+    totals.kcal += t.kcal; totals.p += t.p; totals.f += t.f; totals.c += t.c;
+    h += `<tr><td class="day">${d}</td><td><span title="${day.label}" style="font-size:14px;">${dayIcon(day.type)}</span></td><td class="num">${fmt(t.kcal)}</td><td class="num">${target||'—'}</td><td class="num delta ${ok?'ok':'warn'}">${target?fmtDelta(delta):'—'}</td><td class="num">${fmt(t.p,0)}</td><td class="num">${fmt(t.f,0)}</td><td class="num">${fmt(t.c,0)}</td></tr>`;
+  }
+  h += `<tr class="total"><td>Сумма</td><td>За неделю</td><td class="num">${fmt(totals.kcal)}</td><td class="num">—</td><td class="num">—</td><td class="num">${fmt(totals.p,0)}</td><td class="num">${fmt(totals.f,0)}</td><td class="num">${fmt(totals.c,0)}</td></tr>
+  <tr class="avg"><td>Среднее/день</td><td></td><td class="num">${fmt(totals.kcal/7)}</td><td class="num">—</td><td class="num">—</td><td class="num">${fmt(totals.p/7,0)}</td><td class="num">${fmt(totals.f/7,0)}</td><td class="num">${fmt(totals.c/7,0)}</td></tr></tbody>`;
+  return { html: h, totals };
+}
+
+function renderKbju() {
+  const lp = buildKbjuTable('lp', PROFILE.lp);
+  const is = buildKbjuTable('partner', PROFILE.is);
+  document.getElementById('kbjuLP').innerHTML = lp.html;
+  document.getElementById('kbjuPartner').innerHTML = is.html;
+  document.getElementById('kbjuLpTitle').textContent = `${PROFILE.lp.name} — день за днём`;
+  document.getElementById('kbjuIsTitle').textContent = `${PROFILE.is.name} — день за днём`;
+
+  // Cards: факт vs цель с цветовой подсветкой и дельтой
+  const buildCards = (profile, totals) => {
+    const avg = Math.round(totals.kcal / 7);
+    const macros = profileTargetMacros(profile);
+    const factP = Math.round(totals.p / 7);
+    const factF = Math.round(totals.f / 7);
+    const factC = Math.round(totals.c / 7);
+    const dKcal = avg - macros.kcal;
+    const dP = factP - macros.proteinG;
+    const dF = factF - macros.fatG;
+    const dC = factC - macros.carbsG;
+    // Толерантности: ккал из профиля, БЖУ — относительные
+    const tolP = Math.max(8, Math.round(macros.proteinG * 0.07));
+    const tolF = Math.max(5, Math.round(macros.fatG * 0.12));
+    const tolC = Math.max(10, Math.round(macros.carbsG * 0.12));
+    const tone = (delta, tol) => Math.abs(delta) <= tol ? 'ok' : (delta > 0 ? 'over' : 'under');
+    const perKg = profile.weight ? (factP / profile.weight).toFixed(2) : '—';
+    return `
+      <div class="k-card k-${tone(dKcal, profile.deltaTol)}">
+        <div class="label">${profile.name} ккал</div>
+        <div class="value">${avg}<small> / ${macros.kcal}</small></div>
+        <div class="k-delta">${fmtDelta(dKcal)} ккал</div>
+        <div class="sub">TDEE ${profile.tdee} · цель ${profile.goalKcal>=0?'+':''}${profile.goalKcal}</div>
+      </div>
+      <div class="k-card k-${tone(dP, tolP)}">
+        <div class="label">Белок ${profile.name}</div>
+        <div class="value">${factP}<small> / ${macros.proteinG} г</small></div>
+        <div class="k-delta">${fmtDelta(dP)} г</div>
+        <div class="sub">факт ${perKg} · цель ${profile.proteinPerKg} г/кг</div>
+      </div>
+      <div class="k-card k-${tone(dF, tolF)}">
+        <div class="label">Жир ${profile.name}</div>
+        <div class="value">${factF}<small> / ${macros.fatG} г</small></div>
+        <div class="k-delta">${fmtDelta(dF)} г</div>
+        <div class="sub">${avg?Math.round(factF*9/avg*100):0}% · цель ${profile.fatPercent}%</div>
+      </div>
+      <div class="k-card k-${tone(dC, tolC)}">
+        <div class="label">Углеводы ${profile.name}</div>
+        <div class="value">${factC}<small> / ${macros.carbsG} г</small></div>
+        <div class="k-delta">${fmtDelta(dC)} г</div>
+        <div class="sub">${avg?Math.round(factC*4/avg*100):0}% · цель ${macros.kcal?Math.round(macros.carbsKcal/macros.kcal*100):0}%</div>
+      </div>
+    `;
+  };
+  document.getElementById('kbjuCards').innerHTML = buildCards(PROFILE.lp, lp.totals) + buildCards(PROFILE.is, is.totals);
+}
+
+// =========================================================================
+// SHOP PANEL — собирается из меню, фильтры пересчитывают
+// =========================================================================
+// Какие продукты в какие дни и приёмы используются — собираем + детали по блюдам.
+// SHOP_USAGE пересчитывается при применении/сбросе оверрайдов через rebuildShopUsage().
+function buildShopUsage() {
+  const usage = {}; // fid -> { byDay: { 'Пн': граммы }, days: Set, dishes: [{mid, did, day, mealType, dishName, lpG, isG}] }
+  for (const [mid, meal] of Object.entries(MEALS)) {
+    for (const did of meal.dishes) {
+      const d = DISHES[did];
+      const lpIngs = dishIng(did, 'lp');
+      const partIngs = dishIng(did, 'partner');
+      const lpMap = new Map(lpIngs);
+      const partnerMap = new Map(partIngs);
+      const allFids = new Set([...lpMap.keys(), ...partnerMap.keys()]);
+      for (const fid of allFids) {
+        if (!usage[fid]) usage[fid] = { byDay: {}, days: new Set(), dishes: [] };
+        const lpG = lpMap.get(fid) || 0;
+        const isG = partnerMap.get(fid) || 0;
+        const total = lpG + isG;
+        if (total > 0) {
+          usage[fid].byDay[meal.day] = (usage[fid].byDay[meal.day] || 0) + total;
+          usage[fid].days.add(meal.day);
+          usage[fid].dishes.push({ mid, did, day: meal.day, mealType: meal.type, dishName: d.name, lpG, isG });
+        }
+      }
+    }
+  }
+  return usage;
+}
+let SHOP_USAGE = {};
+function rebuildShopUsage() { SHOP_USAGE = buildShopUsage(); }
+
+// Какой трип покрывает день: первый из TRIPS, у которого день в days[].
+// Если ни одна группа не покрывает — день идёт в первую группу (fallback).
+function dayToTrip(day) {
+  for (const t of TRIPS) if (t.days.includes(day)) return t.id;
+  return TRIPS[0]?.id;
+}
+function tripById(id) { return TRIPS.find(t => t.id === id); }
+function tripOrder() { return TRIPS.map(t => t.id); }
+
+// fresh / perishable / prep-able продукты — распределяются по группам по дням использования
+// (заготовка делается ближе к использованию). Остальное (масло, мёд, орехи) — целиком в первую группу.
+function getProductTrips(fid) {
+  const food = FOOD[fid];
+  const usage = SHOP_USAGE[fid];
+  if (!usage) return [];
+  if (food.fresh || food.perishable || food.prep) {
+    const trips = new Set();
+    for (const day of usage.days) {
+      const tid = dayToTrip(day);
+      if (tid) trips.add(tid);
+    }
+    const order = tripOrder();
+    return [...trips].sort((a,b) => order.indexOf(a) - order.indexOf(b));
+  }
+  return TRIPS[0] ? [TRIPS[0].id] : [];
+}
+
+// Сколько граммов идёт в каждый трип
+function getProductTripQty(fid, tripId) {
+  const usage = SHOP_USAGE[fid];
+  if (!usage) return 0;
+  const trips = getProductTrips(fid);
+  let total = 0;
+  for (const [day, g] of Object.entries(usage.byDay)) {
+    const dayTrip = trips.length === 1 ? trips[0] : dayToTrip(day);
+    if (dayTrip === tripId) total += g;
+  }
+  return total;
+}
+
+let shopFilter = { day: 'all', trip: 'all' };
+
+function renderShopToolbar() {
+  // Описание групп — динамическое
+  const info = document.getElementById('shopInfo');
+  if (info) {
+    const tripsList = TRIPS.map(t => `${t.icon||''} <b>${t.name}</b> (${t.days.join('/')||'нет дней'})`).join(' · ');
+    info.innerHTML = `<b>Как пользоваться:</b> выбери группу закупок (${tripsList}) — увидишь, что взять за один поход. Свежие продукты (мясо/рыба/зелень/молочка) распределены по группам по дням использования; долгохранящиеся (масло, мёд, орехи) — в первой группе на всю неделю. Для каждой позиции внизу — селектор упаковки с остатком/нехваткой.`;
+  }
+  const tb = document.getElementById('shopToolbar');
+  // если активный трип-фильтр исчез после редактирования групп — сбрасываем
+  if (shopFilter.trip !== 'all' && !TRIPS.some(t => t.id === shopFilter.trip)) shopFilter.trip = 'all';
+  let h = '<div class="filter-label">Группа закупки</div>';
+  h += `<button class="filter-btn ${shopFilter.trip==='all'?'active':''}" data-trip="all">Все</button>`;
+  for (const t of TRIPS) {
+    const days = t.days.length ? t.days.join('/') : '—';
+    h += `<button class="filter-btn ${shopFilter.trip===t.id?'active':''}" data-trip="${t.id}" title="Дни: ${days}">${t.icon||''} ${t.name}</button>`;
+  }
+  h += '<div class="filter-label">День</div>';
+  h += `<button class="filter-btn ${shopFilter.day==='all'?'active':''}" data-day="all">Все</button>`;
+  for (const d of DAY_ORDER) {
+    h += `<button class="filter-btn ${shopFilter.day===d?'active':''}" data-day="${d}">${d}</button>`;
+  }
+  tb.innerHTML = h;
+  tb.querySelectorAll('[data-trip]').forEach(b => b.onclick = () => { shopFilter.trip = b.dataset.trip; renderShopToolbar(); renderShop(); });
+  tb.querySelectorAll('[data-day]').forEach(b => b.onclick = () => { shopFilter.day = b.dataset.day; renderShopToolbar(); renderShop(); });
+}
+
+function renderShop() {
+  const checks = Store.get('shopChecksV3', {});
+  const packPick = Store.get('packPickV1', {}); // fid -> packIndex
+  // Считаем количество для каждого продукта, согласно фильтрам
+  const items = [];
+  for (const [fid, food] of Object.entries(FOOD)) {
+    if (food.lpOnly) continue; // протеин — не покупка из ВкусВилл
+    const usage = SHOP_USAGE[fid];
+    if (!usage) continue;
+
+    const dayF = shopFilter.day, tripF = shopFilter.trip;
+    let qty = 0;
+    if (dayF === 'all' && tripF === 'all') {
+      for (const g of Object.values(usage.byDay)) qty += g;
+    } else if (dayF !== 'all' && tripF === 'all') {
+      qty = usage.byDay[dayF] || 0;
+    } else if (dayF === 'all' && tripF !== 'all') {
+      qty = getProductTripQty(fid, tripF);
+    } else {
+      // пересечение: день должен попадать в выбранный трип для этого продукта
+      const dayQty = usage.byDay[dayF] || 0;
+      if (dayQty > 0) {
+        const trips = getProductTrips(fid);
+        const dayTrip = trips.length === 1 ? trips[0] : dayToTrip(dayF);
+        if (dayTrip === tripF) qty = dayQty;
+      }
+    }
+
+    if (qty <= 0) continue;
+    items.push({
+      fid, food, qty,
+      days: [...usage.days].sort((a,b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b)),
+      trips: getProductTrips(fid)
+    });
+  }
+
+  // Группируем по категории
+  const cats = {};
+  for (const item of items) {
+    if (!cats[item.food.cat]) cats[item.food.cat] = [];
+    cats[item.food.cat].push(item);
+  }
+
+  // Summary
+  const totalQty = items.reduce((s, x) => s + x.qty, 0);
+  const tripObj = shopFilter.trip !== 'all' ? tripById(shopFilter.trip) : null;
+  const tripLabel = tripObj ? `${tripObj.icon||''} ${tripObj.name}` : null;
+  const dayLabel = shopFilter.day !== 'all' ? `День ${shopFilter.day}` : null;
+  const parts = [dayLabel, tripLabel].filter(Boolean);
+  const filterLabel = `<b>${parts.length ? parts.join(' · ') : 'Вся неделя'}</b>`;
+  document.getElementById('shopSummary').innerHTML = `${filterLabel} · ${items.length} позиций · общий вес ${(totalQty/1000).toFixed(1)} кг (${PROFILE.lp.name}+${PROFILE.is.name})`;
+
+  // Render
+  let h = '';
+  // Order categories
+  const catOrder = ['Молочка','Мясо/рыба','Готовое ВВ','Крупы','Овощи','Зелень','Ягоды/фрукты','Прочее'];
+  for (const cat of catOrder) {
+    if (!cats[cat]) continue;
+    const arr = cats[cat];
+    h += `<div class="shop-cat"><div class="shop-cat-head"><div class="shop-cat-name">${cat}</div><div class="shop-cat-count">${arr.length} поз.</div></div><ul class="shop-list">`;
+    for (const item of arr) {
+      const checked = checks[item.fid] ? 'checked' : '';
+      const qtyStr = item.qty >= 1000 ? (item.qty/1000).toFixed(2) + ' кг' : Math.round(item.qty) + 'г';
+      // Если выбрана группа — показываем только её тег. Иначе все группы продукта.
+      const visibleTrips = shopFilter.trip === 'all'
+        ? item.trips
+        : item.trips.filter(tid => tid === shopFilter.trip);
+      const tripTags = visibleTrips.map(tid => {
+        const t = tripById(tid);
+        const idx = TRIPS.findIndex(x => x.id === tid);
+        const cls = idx > 0 ? `trip-i-${idx}` : 'trip';
+        return `<span class="shop-tag ${cls}" title="${t?.name||tid}">${t?.icon||''} ${t?.name||tid}</span>`;
+      }).join('');
+      const usage = SHOP_USAGE[item.fid];
+      // Фильтруем дни: при выбранной группе — только её дни; при выбранном дне — только он.
+      const allowedDays = shopFilter.day !== 'all'
+        ? [shopFilter.day]
+        : (shopFilter.trip !== 'all'
+            ? (tripById(shopFilter.trip)?.days || DAY_ORDER)
+            : DAY_ORDER);
+      const filteredDays = item.days.filter(d => allowedDays.includes(d));
+      const visibleDishes = usage.dishes
+        .filter(u => allowedDays.includes(u.day))
+        .sort((a,b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day));
+      const usesPills = visibleDishes.map(u => {
+        const sumG = u.lpG + u.isG;
+        return `<button class="shop-use-pill" data-jump-mid="${u.mid}" data-jump-did="${u.did}" data-jump-day="${u.day}" type="button">
+          <span class="pill-day">${u.day}</span>
+          <span>${u.mealType}</span>
+          <span>·</span>
+          <span>${u.dishName}</span>
+          <span class="pill-meta">${PROFILE.lp.name}${u.lpG}+${PROFILE.is.name}${u.isG} = ${sumG}г</span>
+        </button>`;
+      }).join('');
+      h += `<li class="shop-item ${checked}" id="shop-${item.fid}" data-fid="${item.fid}">
+        <div class="shop-check" aria-hidden="true"></div>
+        <div class="shop-item-info">
+          <div class="shop-item-name">${item.food.name}${item.food.unit?` <span style="font-size:11px;color:var(--ink-muted)">(${item.food.unit})</span>`:''}</div>
+          <div class="shop-item-tags">
+            ${tripTags}
+            ${filteredDays.map(d => `<span class="shop-tag day">${d}</span>`).join('')}
+          </div>
+          ${visibleDishes.length ? `<button class="shop-item-uses-toggle" data-uses-toggle type="button" aria-expanded="false">▸ В каких блюдах (${visibleDishes.length})</button>
+          <div class="shop-item-uses"><div class="shop-uses-list">${usesPills}</div></div>` : ''}
+          ${(item.food.packs && item.food.packs.length) ? (() => {
+            const pickedIdx = Math.min(packPick[item.fid] ?? 0, item.food.packs.length - 1);
+            const pack = item.food.packs[pickedIdx];
+            const need = Math.round(item.qty);
+            const units = Math.max(1, Math.ceil(item.qty / pack.size));
+            const totalBought = units * pack.size;
+            const leftover = totalBought - need;
+            const opts = item.food.packs.map((p, i) => `<option value="${i}" ${i===pickedIdx?'selected':''}>${p.label} (${p.size}г)</option>`).join('');
+            const leftoverHtml = leftover > 0
+              ? `<small style="color:var(--ink-muted);">остаток ${leftover}г</small>`
+              : leftover < 0
+                ? `<small style="color:var(--warn);">не хватает ${-leftover}г</small>`
+                : `<small style="color:var(--sage);">ровно</small>`;
+            return `<div class="shop-pack">
+              <span class="shop-pack-label">Упаковка:</span>
+              <select data-pack-fid="${item.fid}" aria-label="Выбор упаковки">${opts}</select>
+              <span class="shop-pack-units">${units} шт = ${totalBought}г</span>
+              ${leftoverHtml}
+              <small style="color:var(--ink-muted); flex-basis:100%; margin-top:2px;">нужно ${need}г</small>
+            </div>`;
+          })() : ''}
+        </div>
+        <div class="shop-item-qty">${qtyStr}</div>
+      </li>`;
+    }
+    h += `</ul></div>`;
+  }
+  document.getElementById('shopContent').innerHTML = h;
+
+  // Клик по любой части shop-item тоглит чекмарк, ЕСЛИ не попали в интерактив
+  // (раскрывашка, пилюля блюда, селектор упаковки)
+  document.querySelectorAll('.shop-item').forEach(it => {
+    it.onclick = (e) => {
+      if (e.target.closest('[data-uses-toggle], [data-jump-mid], [data-pack-fid], select, option, button')) return;
+      it.classList.toggle('checked');
+      const fid = it.dataset.fid;
+      const c = Store.get('shopChecksV3', {});
+      if (it.classList.contains('checked')) c[fid] = true;
+      else delete c[fid];
+      Store.set('shopChecksV3', c);
+    };
+    // Раскрывашка
+    const toggle = it.querySelector('[data-uses-toggle]');
+    const usesBlock = it.querySelector('.shop-item-uses');
+    if (toggle && usesBlock) {
+      toggle.onclick = (e) => {
+        e.stopPropagation();
+        const open = usesBlock.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        toggle.textContent = (open ? '▾' : '▸') + toggle.textContent.slice(1);
+      };
+    }
+    // Селектор упаковки
+    it.querySelectorAll('[data-pack-fid]').forEach(sel => {
+      sel.onclick = (e) => e.stopPropagation();
+      sel.onchange = (e) => {
+        e.stopPropagation();
+        const fid = sel.dataset.packFid;
+        const idx = parseInt(sel.value, 10);
+        const pp = Store.get('packPickV1', {});
+        pp[fid] = idx;
+        Store.set('packPickV1', pp);
+        renderShop();
+      };
+    });
+    // Переход в меню
+    it.querySelectorAll('[data-jump-mid]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const day = btn.dataset.jumpDay;
+        const mid = btn.dataset.jumpMid;
+        const did = btn.dataset.jumpDid;
+        currentDay = day;
+        renderDaysNav();
+        renderDay(day);
+        switchTo('menu');
+        setTimeout(() => {
+          // открыть нужный приём, если ещё не открыт
+          const meal = document.querySelector(`.meal[data-mid="${mid}"]`);
+          if (meal) {
+            if (!meal.classList.contains('open')) {
+              meal.classList.add('open');
+              meal.querySelector('.meal-header')?.setAttribute('aria-expanded', 'true');
+            }
+            // прокрутить и подсветить нужное блюдо
+            const dish = meal.querySelector(`[data-dish-id="${did}"]`);
+            const target = dish || meal;
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (dish) {
+              dish.classList.add('highlight');
+              setTimeout(() => dish.classList.remove('highlight'), 1500);
+            }
+          }
+        }, 80);
+      };
+    });
+  });
+}
+
+// =========================================================================
+// PORTIONS PANEL — день → приём пищи → все блюда этого приёма
+// =========================================================================
+let portionDay = currentDayCode();
+let portionMid = currentMid() || DAYS[portionDay].meals[0];
+
+function renderPortionDaysNav() {
+  const nav = document.getElementById('portionDaysNav');
+  nav.innerHTML = '';
+  const today = currentDayCode();
+  DAY_ORDER.forEach(d => {
+    const day = DAYS[d];
+    const isToday = d === today;
+    const btn = document.createElement('button');
+    btn.className = `day-btn ${day.type}` + (d === portionDay ? ' active' : '') + (isToday ? ' today' : '');
+    btn.dataset.day = d;
+    btn.title = (isToday ? 'Сегодня · ' : '') + day.label;
+    btn.innerHTML = `<span class="day-name">${d}</span><span class="day-tag" title="${day.label}">${dayIcon(day.type)}</span>`;
+    btn.onclick = () => {
+      portionDay = d;
+      portionMid = DAYS[d].meals[0] || null;
+      renderPortionDaysNav();
+      renderPortionMealSelect();
+      renderPortion();
+    };
+    nav.appendChild(btn);
+  });
+}
+
+function renderPortionMealSelect() {
+  const sel = document.getElementById('portionMealSelect');
+  const meals = DAYS[portionDay].meals;
+  if (!portionMid || !meals.includes(portionMid)) portionMid = meals[0] || null;
+  sel.innerHTML = meals.map(mid => {
+    const meal = MEALS[mid];
+    const dishNames = meal.dishes.map(did => DISHES[did].name).join(' · ');
+    return `<option value="${mid}" ${mid===portionMid?'selected':''}>${meal.type} — ${dishNames}</option>`;
+  }).join('');
+  sel.onchange = () => { portionMid = sel.value; renderPortion(); };
+}
+
+// Стейт фактического общего готового веса по ингредиенту: { did: { fid: actualCookedTotal } }
+// ВАЖНО: только инструмент деления готовой массы между LP и IS.
+// Калории и БЖУ зависят только от сырого веса (фиксированного в меню), от actualCooked НЕ меняются.
+const portionActuals = {};
+
+function buildIngCard(did, fid, lpG, isG) {
+  const food = FOOD[fid];
+  const totalRaw = lpG + isG;
+  const shareLP = totalRaw ? lpG / totalRaw : 0;
+  const shareIS = totalRaw ? isG / totalRaw : 0;
+  const lpCookedPlan = cookedWeight(fid, lpG);
+  const isCookedPlan = cookedWeight(fid, isG);
+  const planCookedTotal = lpCookedPlan + isCookedPlan;
+  const lpKcal = food.kcal * lpG / 100;
+  const isKcal = food.kcal * isG / 100;
+  const actualCooked = portionActuals[did]?.[fid] ?? null;
+  const lpCookedActual = actualCooked != null && totalRaw ? actualCooked * shareLP : lpCookedPlan;
+  const isCookedActual = actualCooked != null && totalRaw ? actualCooked * shareIS : isCookedPlan;
+  const isAdjusted = actualCooked != null;
+  const onlyOne = (lpG === 0) || (isG === 0);
+  const onlyOneText = lpG === 0
+    ? `${PROFILE.is.name} получает <b>${isG}г сырого</b> → ~${Math.round(isCookedPlan)}г готового. ${PROFILE.lp.name} не ест этот ингредиент.`
+    : `${PROFILE.lp.name} получает <b>${lpG}г сырого</b> → ~${Math.round(lpCookedPlan)}г готового. ${PROFILE.is.name} не ест этот ингредиент.`;
+
+  return `<div class="ing-card" data-fid="${fid}" data-did="${did}">
+    <div class="ing-card-head">
+      <span class="ing-card-name">${food.name}</span>
+      ${onlyOne ? `<span class="ing-card-share">только одному</span>`
+                : `<span class="ing-card-share">сырой план: <b>${lpG}г</b> + <b>${isG}г</b> = ${totalRaw}г · доля ${(shareLP*100).toFixed(0)}/${(shareIS*100).toFixed(0)}%</span>`}
+    </div>
+    ${onlyOne ? `<div class="ing-only-one">${onlyOneText}</div>` : `
+    <div class="ing-rows">
+      <div class="ing-row lp">
+        <div class="who">${PROFILE.lp.name}</div>
+        <div class="raw">${lpG}<small>г сыр</small> · ~${Math.round(lpCookedPlan)}<small>г готов</small></div>
+        ${isAdjusted ? `<div class="meta">положить готового: <span class="actual">${Math.round(lpCookedActual)}г</span></div>` : ''}
+        <div class="meta">${fmt(lpKcal)} ккал · Б ${fmt(food.p*lpG/100,1)} · Ж ${fmt(food.f*lpG/100,1)} · У ${fmt(food.c*lpG/100,1)}</div>
+      </div>
+      <div class="ing-row is">
+        <div class="who">${PROFILE.is.name}</div>
+        <div class="raw">${isG}<small>г сыр</small> · ~${Math.round(isCookedPlan)}<small>г готов</small></div>
+        ${isAdjusted ? `<div class="meta">положить готового: <span class="actual">${Math.round(isCookedActual)}г</span></div>` : ''}
+        <div class="meta">${fmt(isKcal)} ккал · Б ${fmt(food.p*isG/100,1)} · Ж ${fmt(food.f*isG/100,1)} · У ${fmt(food.c*isG/100,1)}</div>
+      </div>
+    </div>`}
+    ${(() => {
+      // Показываем поле «Факт. готового» только если готовый вес ≠ сырому (т.е. продукт реально варится/жарится)
+      const cf = food.cookFactor;
+      const cooks = cf != null && Math.abs(cf - 1) > 0.01;
+      if (onlyOne || lpG <= 0 || isG <= 0 || !cooks) return '';
+      return `<div class="ing-cook-input">
+        <label for="ing-actual-${did}-${fid}">Факт. общий готовый</label>
+        <input id="ing-actual-${did}-${fid}" type="number" min="0" step="5" data-actual-fid="${fid}" data-actual-did="${did}" value="${isAdjusted ? Math.round(actualCooked) : ''}" placeholder="${Math.round(planCookedTotal)}">
+        <span class="hint">${isAdjusted
+          ? `делю ${Math.round(actualCooked)}г → ${PROFILE.lp.name} <b style="color:var(--accent)">${Math.round(lpCookedActual)}г</b> · ${PROFILE.is.name} <b style="color:var(--sage)">${Math.round(isCookedActual)}г</b>`
+          : `план ${Math.round(planCookedTotal)}г готового. Введи фактический, чтобы поделить точно.`}</span>
+        ${isAdjusted ? `<button class="reset" data-reset-fid="${fid}" data-reset-did="${did}" type="button">↺ к плану</button>` : ''}
+      </div>`;
+    })()}
+  </div>`;
+}
+
+// Карточка для группы ингредиентов, готовящихся вместе (или для unified-блюда целиком)
+// fids: массив fid'ов в этой группе (или null = всё блюдо)
+// title: заголовок (например, «Овсянка варится вместе» или «Готовится одним блюдом»)
+function buildCookGroupCard(did, fids, title) {
+  const lpIngs = dishIng(did, 'lp').filter(([f]) => !fids || fids.includes(f));
+  const partIngs = dishIng(did, 'partner').filter(([f]) => !fids || fids.includes(f));
+  const lpMap = new Map(lpIngs);
+  const partMap = new Map(partIngs);
+  let lpRaw = 0, isRaw = 0, lpCooked = 0, isCooked = 0;
+  for (const [fid, g] of lpIngs) { lpRaw += g; lpCooked += cookedWeight(fid, g); }
+  for (const [fid, g] of partIngs) { isRaw += g; isCooked += cookedWeight(fid, g); }
+  const totalRaw = lpRaw + isRaw;
+  const totalCookedPlan = lpCooked + isCooked;
+  const shareLP = totalRaw ? lpRaw / totalRaw : 0.5;
+  const shareIS = 1 - shareLP;
+  // Уникальный ключ для группы (по сцепке fid'ов или _unified)
+  const key = fids ? fids.slice().sort().join('+') : '_unified';
+  const actual = portionActuals[did]?.[key] ?? null;
+  const used = actual ?? totalCookedPlan;
+  const lpPart = used * shareLP;
+  const isPart = used * shareIS;
+  const isAdjusted = actual != null && Math.abs(actual - totalCookedPlan) > 0.5;
+
+  // Список ингредиентов этой группы
+  const allFids = [...new Set([...lpMap.keys(), ...partMap.keys()])];
+  const ingList = allFids.map(fid => {
+    const food = FOOD[fid];
+    const lpG = lpMap.get(fid) || 0;
+    const isG = partMap.get(fid) || 0;
+    return `<div class="unified-ing-row">
+      <span class="ing-name">${food.name}</span>
+      <span class="ing-grams">${PROFILE.lp.name} ${lpG}г · ${PROFILE.is.name} ${isG}г</span>
+    </div>`;
+  }).join('');
+
+  return `<div class="ing-card">
+    <div class="ing-card-head">
+      <span class="ing-card-name" style="font-size:14px;">${title}</span>
+      <span class="ing-card-share">сырой <b>${totalRaw}г</b> → готового ~<b>${Math.round(totalCookedPlan)}г</b> · доля ${(shareLP*100).toFixed(0)}/${(shareIS*100).toFixed(0)}%</span>
+    </div>
+    <div class="ing-cook-input">
+      <label for="cook-${did}-${key}">Факт. общий готовый вес</label>
+      <input id="cook-${did}-${key}" type="number" min="0" step="5" data-actual-fid="${key}" data-actual-did="${did}" value="${isAdjusted ? Math.round(actual) : ''}" placeholder="${Math.round(totalCookedPlan)}">
+      <span class="hint">${isAdjusted
+        ? `делю ${Math.round(actual)}г → ${PROFILE.lp.name} <b style="color:var(--accent)">${Math.round(lpPart)}г</b> · ${PROFILE.is.name} <b style="color:var(--sage)">${Math.round(isPart)}г</b>`
+        : `${PROFILE.lp.name} <b style="color:var(--accent)">${Math.round(lpPart)}г</b> · ${PROFILE.is.name} <b style="color:var(--sage)">${Math.round(isPart)}г</b> готового. Введи факт, если получилось иначе.`}</span>
+      ${isAdjusted ? `<button class="reset" data-reset-fid="${key}" data-reset-did="${did}" type="button">↺ к плану</button>` : ''}
+    </div>
+    <div class="unified-ings">${ingList}</div>
+  </div>`;
+}
+
+// Простой список «свободных» ингредиентов — без поля деления, просто граммовки LP/IS
+function buildSideIngList(did, fids) {
+  if (!fids || !fids.length) return '';
+  const lpMap = new Map(dishIng(did, 'lp'));
+  const partMap = new Map(dishIng(did, 'partner'));
+  const rows = fids.map(fid => {
+    const food = FOOD[fid];
+    const lpG = lpMap.get(fid) || 0;
+    const isG = partMap.get(fid) || 0;
+    if (lpG === 0 && isG === 0) return '';
+    return `<div class="unified-ing-row">
+      <span class="ing-name">${food.name}</span>
+      <span class="ing-grams">${PROFILE.lp.name} <b style="color:var(--accent)">${lpG}г</b> · ${PROFILE.is.name} <b style="color:var(--sage)">${isG}г</b></span>
+    </div>`;
+  }).filter(Boolean).join('');
+  return `<div class="ing-card">
+    <div class="ing-card-head">
+      <span class="ing-card-name" style="font-size:14px;">Кладётся в тарелку</span>
+      <span class="ing-card-share">не делится — у каждого свои граммы</span>
+    </div>
+    <div class="unified-ings">${rows}</div>
+  </div>`;
+}
+
+function buildDishBlock(did) {
+  const dish = DISHES[did];
+  const lpPlan = calcDish(did, 'lp');
+  const isPlan = calcDish(did, 'partner');
+
+  let bodyHtml;
+  const lpIngs = dishIng(did, 'lp');
+  const partIngs = dishIng(did, 'partner');
+  const allFids = [...new Set([...lpIngs.map(([f])=>f), ...partIngs.map(([f])=>f)])];
+
+  if (dish.cookedTogether && dish.cookedTogether.length) {
+    // Карточка варимой группы + список свободных
+    const cookFids = dish.cookedTogether.filter(f => allFids.includes(f));
+    const sideFids = allFids.filter(f => !cookFids.includes(f));
+    const cookNames = cookFids.map(f => FOOD[f]?.name || f).join(' + ');
+    bodyHtml = buildCookGroupCard(did, cookFids, `Варится вместе: ${cookNames} — делю готовое`)
+             + buildSideIngList(did, sideFids);
+  } else if (dish.unifiedCook) {
+    // Одна карточка для всего блюда
+    bodyHtml = buildCookGroupCard(did, null, 'Готовится одним блюдом — делю готовое');
+  } else {
+    // Раздельно ингредиент за ингредиентом
+    const lpMap = new Map(lpIngs);
+    const partnerMap = new Map(partIngs);
+    bodyHtml = allFids.map(fid => buildIngCard(did, fid, lpMap.get(fid) || 0, partnerMap.get(fid) || 0)).join('');
+  }
+
+  return `<div class="portion-result" data-portion-did="${did}">
+    <div class="portion-result-head">
+      <h3>${dishIcon(did)} ${dish.name}</h3>
+      <button class="btn-ghost portion-jump-menu" data-jump-menu="${did}" type="button">→ открыть в Меню</button>
+    </div>
+    <div class="portion-meta">
+      <span>Сырой план ${PROFILE.lp.name}: <b>${fmt(lpPlan.weight)}г</b> · ${fmt(lpPlan.kcal)} ккал</span>
+      <span>Сырой план ${PROFILE.is.name}: <b>${fmt(isPlan.weight)}г</b> · ${fmt(isPlan.kcal)} ккал</span>
+    </div>
+    ${bodyHtml}
+    <div class="portion-totals">
+      <div class="totals-card lp">
+        <div class="label">${PROFILE.lp.name} (план)</div>
+        <div class="big">${fmt(lpPlan.kcal)}<small> ккал</small></div>
+        <div class="bju">Б ${fmt(lpPlan.p,1)} · Ж ${fmt(lpPlan.f,1)} · У ${fmt(lpPlan.c,1)} · ${fmt(lpPlan.weight)}г сыр</div>
+      </div>
+      <div class="totals-card is">
+        <div class="label">${PROFILE.is.name} (план)</div>
+        <div class="big">${fmt(isPlan.kcal)}<small> ккал</small></div>
+        <div class="bju">Б ${fmt(isPlan.p,1)} · Ж ${fmt(isPlan.f,1)} · У ${fmt(isPlan.c,1)} · ${fmt(isPlan.weight)}г сыр</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPortion() {
+  const out = document.getElementById('portionResult');
+  // Подсказка с актуальными именами LP/IS
+  const tip = document.getElementById('portionLogicTip');
+  if (tip) {
+    tip.innerHTML = `<b>Калории и БЖУ зафиксированы планом</b> (из сырого веса). Поле «Факт. общий готовый» — только для деления готовой массы между ${PROFILE.lp.name} и ${PROFILE.is.name}, когда ингредиент готовится в один батч на двоих и реальный вес отличается от планового.`;
+  }
+  if (!portionMid || !MEALS[portionMid]) { out.innerHTML = ''; return; }
+  const meal = MEALS[portionMid];
+
+  // Шапка приёма + сумма по всем блюдам этого приёма
+  let mLP = { kcal:0, p:0, f:0, c:0, weight:0 };
+  let mIS = { kcal:0, p:0, f:0, c:0, weight:0 };
+  for (const did of meal.dishes) {
+    const a = calcDish(did, 'lp'), b = calcDish(did, 'partner');
+    mLP.kcal+=a.kcal; mLP.p+=a.p; mLP.f+=a.f; mLP.c+=a.c; mLP.weight+=a.weight;
+    mIS.kcal+=b.kcal; mIS.p+=b.p; mIS.f+=b.f; mIS.c+=b.c; mIS.weight+=b.weight;
+  }
+  const dishBlocks = meal.dishes.map(did => buildDishBlock(did)).join('');
+
+  out.innerHTML = `
+    ${buildNowBar('portion', portionDay, portionMid)}
+    <div class="portion-result" style="background:var(--bg-soft);">
+      <div class="meal-tag" style="margin-bottom:6px;">${portionDay} · ${meal.type}${meal.train==='pre'?' <span class="tag-train">⤴ пред-трен</span>':meal.train==='post'?' <span class="tag-train">⤵ пост-трен</span>':''}</div>
+      <h3 style="margin-bottom:8px;">${meal.dishes.map(did => DISHES[did].name).join(' · ')}</h3>
+      <div class="portion-totals">
+        <div class="totals-card lp">
+          <div class="label">${PROFILE.lp.name} приём итого</div>
+          <div class="big">${fmt(mLP.kcal)}<small> ккал</small></div>
+          <div class="bju">Б ${fmt(mLP.p,1)} · Ж ${fmt(mLP.f,1)} · У ${fmt(mLP.c,1)} · ${fmt(mLP.weight)}г сыр</div>
+        </div>
+        <div class="totals-card is">
+          <div class="label">${PROFILE.is.name} приём итого</div>
+          <div class="big">${fmt(mIS.kcal)}<small> ккал</small></div>
+          <div class="bju">Б ${fmt(mIS.p,1)} · Ж ${fmt(mIS.f,1)} · У ${fmt(mIS.c,1)} · ${fmt(mIS.weight)}г сыр</div>
+        </div>
+      </div>
+    </div>
+    ${dishBlocks}
+  `;
+
+  // Обработчики «факт. готового»
+  out.querySelectorAll('[data-actual-fid]').forEach(inp => {
+    inp.oninput = () => {
+      const fid = inp.dataset.actualFid;
+      const did = inp.dataset.actualDid;
+      const v = parseFloat(inp.value);
+      if (!portionActuals[did]) portionActuals[did] = {};
+      if (isNaN(v) || v <= 0) delete portionActuals[did][fid];
+      else portionActuals[did][fid] = v;
+      renderPortion();
+      const inp2 = document.querySelector(`[data-actual-did="${did}"][data-actual-fid="${fid}"]`);
+      if (inp2) { inp2.focus(); inp2.setSelectionRange(inp2.value.length, inp2.value.length); }
+    };
+  });
+  out.querySelectorAll('[data-reset-fid]').forEach(btn => {
+    btn.onclick = () => {
+      const fid = btn.dataset.resetFid;
+      const did = btn.dataset.resetDid;
+      if (portionActuals[did]) delete portionActuals[did][fid];
+      renderPortion();
+    };
+  });
+  // «к сегодня» — переключиться на текущий день и приём
+  out.querySelectorAll('[data-now-go-portion]').forEach(btn => {
+    btn.onclick = () => {
+      portionDay = currentDayCode();
+      portionMid = currentMid() || (DAYS[portionDay].meals[0] || null);
+      renderPortionDaysNav();
+      renderPortionMealSelect();
+      renderPortion();
+    };
+  });
+  // «→ открыть в Меню» — переходим к нужному дню/приёму/блюду
+  out.querySelectorAll('[data-jump-menu]').forEach(btn => {
+    btn.onclick = () => {
+      const did = btn.dataset.jumpMenu;
+      const found = Object.entries(MEALS).find(([, m]) => m.dishes.includes(did));
+      if (!found) return;
+      const [mid, meal] = found;
+      currentDay = meal.day;
+      renderDaysNav();
+      renderDay(meal.day);
+      switchTo('menu');
+      setTimeout(() => {
+        const m = document.querySelector(`.meal[data-mid="${mid}"]`);
+        if (m) {
+          if (!m.classList.contains('open')) {
+            m.classList.add('open');
+            m.querySelector('.meal-header')?.setAttribute('aria-expanded', 'true');
+          }
+          const dish = m.querySelector(`[data-dish-id="${did}"]`);
+          (dish || m).scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (dish) {
+            dish.classList.add('highlight');
+            setTimeout(() => dish.classList.remove('highlight'), 1500);
+          }
+        }
+      }, 80);
+    };
+  });
+}
+
+// =========================================================================
+// PREP PANEL
+// =========================================================================
+// Считаем сырьё и дни использования для заготовки: сумма по всем приёмам, где встречается продукт
+function calcPrep(fid) {
+  let raw = 0;
+  const days = new Set();
+  for (const [, meal] of Object.entries(MEALS)) {
+    let used = 0;
+    for (const did of meal.dishes) {
+      for (const [id, g] of dishIng(did, 'lp')) if (id === fid) used += g;
+      for (const [id, g] of dishIng(did, 'partner')) if (id === fid) used += g;
+    }
+    if (used > 0) {
+      raw += used;
+      days.add(meal.day);
+    }
+  }
+  return { raw, days: [...days].sort((a,b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b)) };
+}
+
+// Список заготовок в карточке группы: продукты с FOOD[fid].prep, что покупаются в эту группу,
+// и которые ещё используются в дни группы.
+function buildPrepForTrip(trip) {
+  const items = [];
+  for (const [fid, food] of Object.entries(FOOD)) {
+    if (!food.prep) continue;
+    if (!SHOP_USAGE[fid]) continue;
+    const trips = getProductTrips(fid);
+    if (!trips.includes(trip.id)) continue;
+    const usage = SHOP_USAGE[fid];
+    let raw = 0;
+    const usedDays = [];
+    for (const day of usage.days) {
+      if (!trip.days.includes(day)) continue;
+      raw += usage.byDay[day] || 0;
+      usedDays.push(day);
+    }
+    if (raw <= 0) continue;
+    items.push({ fid, recipe: food.prep, factor: food.cookFactor, raw, days: usedDays.sort((a,b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b)) });
+  }
+  return items;
+}
+
+let prepFilter = 'all'; // фильтр по группам: 'all' или trip.id
+
+function renderPrepToolbar() {
+  const tb = document.getElementById('prepToolbar');
+  if (!tb) return;
+  if (prepFilter !== 'all' && !TRIPS.some(t => t.id === prepFilter)) prepFilter = 'all';
+  let h = '<div class="filter-label">Группа закупки</div>';
+  h += `<button class="filter-btn ${prepFilter==='all'?'active':''}" data-prep-trip="all">Все</button>`;
+  for (const t of TRIPS) {
+    h += `<button class="filter-btn ${prepFilter===t.id?'active':''}" data-prep-trip="${t.id}" title="Дни: ${t.days.join('/')}">${t.icon||''} ${t.name}</button>`;
+  }
+  tb.innerHTML = h;
+  tb.querySelectorAll('[data-prep-trip]').forEach(b => b.onclick = () => {
+    prepFilter = b.dataset.prepTrip;
+    renderPrepToolbar();
+    renderPrep();
+  });
+}
+
+function renderPrep() {
+  renderPrepToolbar();
+  // Проверка покрытия дней группами
+  const covered = new Set();
+  for (const t of TRIPS) for (const d of t.days) covered.add(d);
+  const missing = DAY_ORDER.filter(d => !covered.has(d));
+  const warnHtml = missing.length
+    ? `<div class="profile-warn" style="margin: 0 0 12px;"><b>⚠ Не все дни покрыты группами закупок:</b> ${missing.join(', ')} — для них продукты идут в первую группу. Добавь группы на вкладке «Профиль» или нажми там «Сбросить группы к дефолту».</div>`
+    : '';
+
+  let h = `${warnHtml}<div class="tip" style="margin-top:0;">
+    <b>Логика:</b> для каждой группы закупок (см. вкладку «Профиль») — карточка заготовок из тех продуктов, что покупаются в эту группу.
+  </div>`;
+
+  const KIND_LABELS = { cooked: 'Приготовить', cut: 'Нарезать', marinated: 'Маринование' };
+  const KIND_INTRO  = {
+    cut: 'Помыть всё. Хранить нарезанным в контейнере в холодильнике 1–2 дня.',
+    cooked: 'Промыть. Замариновать (для мяса). Хранить готовое 3–4 дня в холодильнике, либо порционно заморозить.',
+    marinated: ''
+  };
+  const KIND_ORDER = ['cooked', 'cut', 'marinated'];
+
+  const buildItemHtml = (it) => {
+    const r = it.recipe;
+    const factor = it.factor;
+    let yieldHtml = '';
+    if (r.kind === 'cooked' && factor != null) {
+      if (factor < 1) {
+        yieldHtml = `<b>${it.raw}г</b> сыр <span class="ar">→</span> ~${Math.round(it.raw * factor)}г`;
+      } else {
+        yieldHtml = `<b>${it.raw}г</b> ${r.dryName||'сух.'} <span class="ar">→</span> ~${Math.round(it.raw * factor)}г`;
+      }
+    } else if (r.kind === 'cut') {
+      yieldHtml = `<b>${it.raw}г</b>`;
+    } else if (r.kind === 'marinated') {
+      yieldHtml = `<b>${it.raw}г</b> мариновать`;
+    } else {
+      yieldHtml = `<b>${it.raw}г</b>`;
+    }
+    return `<li class="prep-item">
+      <div class="prep-item-row">
+        <span class="prep-item-name">${r.name}</span>
+        <span class="prep-item-yield">${yieldHtml}</span>
+        <span class="prep-item-days">${it.days.map(d=>`<span class="day-pill">${d}</span>`).join('')}</span>
+        <span class="prep-item-time">${r.time||'—'}мин</span>
+      </div>
+      ${r.instruction ? `<div class="prep-item-detail">${r.instruction}</div>` : ''}
+    </li>`;
+  };
+
+  const cardsRendered = [];
+  const tripsToRender = prepFilter === 'all' ? TRIPS : TRIPS.filter(t => t.id === prepFilter);
+  for (const trip of tripsToRender) {
+    const items = buildPrepForTrip(trip);
+    if (!items.length) continue;
+    const totalTime = items.reduce((s, x) => s + (x.recipe.time || 0), 0);
+    // Группируем по kind: cooked / cut / marinated
+    const byKind = {};
+    for (const it of items) {
+      const k = it.recipe.kind || 'other';
+      (byKind[k] = byKind[k] || []).push(it);
+    }
+    const sections = KIND_ORDER
+      .filter(k => byKind[k])
+      .map(k => `
+        <div class="prep-section">
+          <div class="prep-section-title">${KIND_LABELS[k]} <span class="prep-section-count">${byKind[k].length}</span></div>
+          ${KIND_INTRO[k] ? `<div class="prep-section-intro">${KIND_INTRO[k]}</div>` : ''}
+          <ul class="prep-list">${byKind[k].map(buildItemHtml).join('')}</ul>
+        </div>`)
+      .join('');
+    const dayList = trip.days.length ? trip.days.join('/') : '—';
+    h += `<div class="prep-card">
+      <div class="prep-when">${trip.icon||''} ${trip.name} · дни ${dayList} · ~${totalTime} мин суммарно</div>
+      <h3>Сборка готовки</h3>
+      <p class="intro">${items.length} ${items.length===1?'действие':items.length<5?'действия':'действий'} по подготовке. Граммовки и теги дней собраны автоматически.</p>
+      ${sections}
+    </div>`;
+    cardsRendered.push(trip.id);
+  }
+
+  // Продукты без заготовок и без trip-привязки — явно сообщить (овощи, фрукты, зелень)
+  if (!cardsRendered.length) {
+    h += `<div class="prep-card"><p class="intro">В текущих группах закупок нет продуктов с настроенными заготовками. Чтобы добавить заготовку для продукта — добавьте поле <code>prep: { kind, time, name, instruction }</code> прямо в <code>FOOD[fid]</code>.</p></div>`;
+  }
+
+  document.getElementById('prepContent').innerHTML = h;
+}
+
+// =========================================================================
+// PROFILE PANEL — редактирование LP, IS и групп закупок
+// =========================================================================
+let activeProfileKey = 'lp';
+function rerenderEverything() {
+  renderHeader();
+  renderDay(currentDay);
+  renderKbju();
+  renderShopToolbar();
+  renderShop();
+  renderPrep();
+}
+
+// Live-таблица «Цель vs Факт по дням» — для каждого дня показываем target из профиля и факт из меню
+function buildProfileLiveTable(key) {
+  const p = PROFILE[key];
+  const who = key === 'lp' ? 'lp' : 'partner';
+  let totalTarget = 0, totalFact = 0;
+  let rows = '';
+  for (const d of DAY_ORDER) {
+    const t = calcDay(d, who);
+    const target = profileDailyTarget(p, d);
+    const fact = Math.round(t.kcal);
+    const delta = fact - target;
+    const ok = Math.abs(delta) <= p.deltaTol;
+    totalTarget += target; totalFact += fact;
+    const dayCls = DAYS[d].type === 'train' ? 'train' : 'rest';
+    rows += `<tr>
+      <td class="day ${dayCls}">${d}</td>
+      <td>${target||'—'}</td>
+      <td>${fact}</td>
+      <td class="delta ${target?(ok?'ok':'warn'):''}">${target?fmtDelta(delta):'—'}</td>
+    </tr>`;
+  }
+  const avgT = Math.round(totalTarget/7), avgF = Math.round(totalFact/7), avgD = avgF - avgT;
+  const avgOk = Math.abs(avgD) <= p.deltaTol;
+  rows += `<tr class="avg-row">
+    <td class="day">Среднее</td>
+    <td>${avgT}</td>
+    <td>${avgF}</td>
+    <td class="delta ${avgOk?'ok':'warn'}">${fmtDelta(avgD)}</td>
+  </tr>`;
+  return `<div class="profile-live">
+    <div class="profile-live-head">
+      <span>Цель vs факт по дням</span>
+      <span class="head-hint">обновляется при вводе любого числа выше</span>
+    </div>
+    <table>
+      <thead><tr><th style="text-align:left;">День</th><th>Цель</th><th>Факт (меню)</th><th>Δ ккал</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+// Обновление live-сводки и значений внутри одного профиля (без потери фокуса инпутов)
+function updateProfileSummary(key) {
+  const p = PROFILE[key];
+  // Найти карточку этого профиля и переписать .profile-summary
+  const card = document.querySelector(`.profile-card[data-pf-card="${key}"]`);
+  if (!card) return;
+  const macros = profileTargetMacros(p);
+  const who = key === 'lp' ? 'lp' : 'partner';
+  let weekKcal=0, weekP=0, weekF=0, weekC=0;
+  for (const d of DAY_ORDER) {
+    const t = calcDay(d, who);
+    weekKcal += t.kcal; weekP += t.p; weekF += t.f; weekC += t.c;
+  }
+  const factK = Math.round(weekKcal/7), factP = Math.round(weekP/7), factF = Math.round(weekF/7), factC = Math.round(weekC/7);
+  const dK = factK - macros.kcal, dP = factP - macros.proteinG, dF = factF - macros.fatG, dC = factC - macros.carbsG;
+  const cls = (n, tol) => Math.abs(n) <= tol ? 'ok' : 'warn';
+  const summary = card.querySelector('.profile-summary');
+  if (summary) {
+    summary.innerHTML = `
+      <div class="row">
+        <span class="pl-label">План:</span>
+        <span><span class="pl-val">${macros.kcal}<small> ккал</small></span></span>
+        <span class="pl-arrow">·</span>
+        <span>Б <span class="pl-val">${macros.proteinG}<small>г</small></span></span>
+        <span>Ж <span class="pl-val">${macros.fatG}<small>г</small></span></span>
+        <span>У <span class="pl-val">${macros.carbsG}<small>г</small></span></span>
+      </div>
+      <div class="row">
+        <span class="pl-label">Факт (среднее из меню):</span>
+        <span><span class="pl-val ${cls(dK, p.deltaTol)}">${factK}<small> ккал · ${fmtDelta(dK)}</small></span></span>
+        <span class="pl-arrow">·</span>
+        <span>Б <span class="pl-val ${cls(dP, 10)}">${factP}<small>г · ${fmtDelta(dP)}</small></span></span>
+        <span>Ж <span class="pl-val ${cls(dF, 10)}">${factF}<small>г · ${fmtDelta(dF)}</small></span></span>
+        <span>У <span class="pl-val ${cls(dC, 20)}">${factC}<small>г · ${fmtDelta(dC)}</small></span></span>
+      </div>
+      <div class="profile-formula">target = ${p.tdee} + (${p.goalKcal>=0?'+':''}${p.goalKcal}) = <b>${macros.kcal} ккал/день</b>. Белок: ${p.weight}кг × ${p.proteinPerKg} = ${macros.proteinG}г · Жир: ${p.fatPercent}% × ${macros.kcal} ÷ 9 = ${macros.fatG}г · Углеводы: остаток ${macros.carbsKcal} ккал ÷ 4 = ${macros.carbsG}г.</div>
+    `;
+  }
+  // Подсказки в полях (содержат расчёт)
+  card.querySelectorAll('.profile-field').forEach(f => {
+    const lab = f.querySelector('label')?.getAttribute('for');
+    if (lab === `pf-${key}-protein`) f.querySelector('.hint').innerHTML = `${p.weight} × ${p.proteinPerKg} = <b>${macros.proteinG} г белка/день</b>`;
+    if (lab === `pf-${key}-fat`) f.querySelector('.hint').innerHTML = `${macros.kcal} × ${p.fatPercent}% / 9 = <b>${macros.fatG} г жира/день</b>`;
+    if (lab === `pf-${key}-tdee`) f.querySelector('.hint').innerHTML = `Поддержание веса · ${p.weight>0?(p.tdee/p.weight).toFixed(1):'—'} ккал/кг (пересчитывается от веса)`;
+  });
+  // Углеводы (disabled inp)
+  card.querySelectorAll('input[disabled]').forEach(i => i.value = macros.carbsG);
+  // Синхронизация TDEE-инпута, если он пересчитался от изменения веса
+  const tdeeInp = card.querySelector(`input[data-pf="${key}"][data-pf-key="tdee"]`);
+  if (tdeeInp && document.activeElement !== tdeeInp) tdeeInp.value = p.tdee;
+  // Если режим auto — пересчитать значения дневных таргетов в инпутах (они readonly)
+  if (p.targetMode === 'auto') {
+    for (const d of DAY_ORDER) {
+      const inp = card.querySelector(`input[data-pf="${key}"][data-pf-target="${d}"]`);
+      if (inp) inp.value = profileDailyTarget(p, d);
+    }
+  }
+  // Пересобрать live-таблицу «цель vs факт»
+  const live = card.querySelector('.profile-live');
+  if (live) live.outerHTML = buildProfileLiveTable(key);
+}
+
+function renderProfile() {
+  const personCard = (key) => {
+    const p = PROFILE[key];
+    const isIs = key === 'is';
+    const macros = profileTargetMacros(p);
+    // Факт по меню — ккал и БЖУ среднее
+    const who = key === 'lp' ? 'lp' : 'partner';
+    let weekKcal=0, weekP=0, weekF=0, weekC=0;
+    for (const d of DAY_ORDER) {
+      const t = calcDay(d, who);
+      weekKcal += t.kcal; weekP += t.p; weekF += t.f; weekC += t.c;
+    }
+    const factK = Math.round(weekKcal/7), factP = Math.round(weekP/7), factF = Math.round(weekF/7), factC = Math.round(weekC/7);
+    const dK = factK - macros.kcal, dP = factP - macros.proteinG, dF = factF - macros.fatG, dC = factC - macros.carbsG;
+    const cls = (n, tol) => Math.abs(n) <= tol ? 'ok' : 'warn';
+
+    const targets = DAY_ORDER.map(d => {
+      const tcls = DAYS[d].type === 'train' ? 'train' : 'rest';
+      const v = p.targetMode === 'manual' ? (p.targets[d]||'') : profileDailyTarget(p, d);
+      return `<div class="target-cell ${tcls}">
+        <label>${d}</label>
+        <input type="number" min="500" max="4000" step="10" data-pf="${key}" data-pf-target="${d}" value="${v}" ${p.targetMode==='auto'?'readonly':''}>
+      </div>`;
+    }).join('');
+
+    const goalRadios = [
+      ['cut','Похудение','-500'],
+      ['maintain','Поддержание','0'],
+      ['bulk','Набор','+300']
+    ].map(([val,label,hint]) => `
+      <label class="profile-radio ${p.goal===val?'checked':''}">
+        <input type="radio" name="pf-${key}-goal" data-pf="${key}" data-pf-key="goal" value="${val}" ${p.goal===val?'checked':''}>
+        ${label} <small style="color:var(--ink-muted);font-weight:500;">${hint}</small>
+      </label>`).join('');
+
+    const modeRadios = [
+      ['auto','Авто (по дню)'],
+      ['manual','Вручную']
+    ].map(([val,label]) => `
+      <label class="profile-radio ${p.targetMode===val?'checked':''}">
+        <input type="radio" name="pf-${key}-mode" data-pf="${key}" data-pf-key="targetMode" value="${val}">
+        ${label}
+      </label>`).join('');
+
+    return `
+      <div class="profile-card" data-pf-card="${key}">
+        <div class="profile-card-head">
+          <span class="badge ${isIs?'is':''}">${p.name}</span>
+          <h3>${isIs?'Партнёр':'Основной профиль'}</h3>
+        </div>
+
+        <div class="profile-grid">
+          <div class="profile-field">
+            <label for="pf-${key}-name">Имя/инициалы</label>
+            <input id="pf-${key}-name" type="text" data-pf="${key}" data-pf-key="name" value="${p.name}" maxlength="6">
+            <div class="hint">Отображается в шапке и таблицах</div>
+          </div>
+          <div class="profile-field">
+            <label for="pf-${key}-weight">Вес, кг</label>
+            <input id="pf-${key}-weight" type="number" min="30" max="200" step="0.5" data-pf="${key}" data-pf-key="weight" value="${p.weight}">
+            <div class="hint">Влияет на белок (г/кг → г/день)</div>
+          </div>
+          <div class="profile-field">
+            <label for="pf-${key}-tdee">TDEE, ккал</label>
+            <input id="pf-${key}-tdee" type="number" min="1000" max="5000" step="10" data-pf="${key}" data-pf-key="tdee" value="${p.tdee}">
+            <div class="hint">Поддержание веса · ${p.weight>0?(p.tdee/p.weight).toFixed(1):'—'} ккал/кг (пересчитывается от веса)</div>
+          </div>
+          <div class="profile-field">
+            <label for="pf-${key}-tol">Толерантность Δ, ккал</label>
+            <input id="pf-${key}-tol" type="number" min="0" max="500" step="10" data-pf="${key}" data-pf-key="deltaTol" value="${p.deltaTol}">
+            <div class="hint">±коридор зелёного маркера в КБЖУ</div>
+          </div>
+        </div>
+
+        <div class="profile-field" style="margin-top:6px;">
+          <label>Цель</label>
+          <div class="profile-radio-group">${goalRadios}</div>
+        </div>
+        <div class="profile-grid" style="margin-top:10px;">
+          <div class="profile-field">
+            <label for="pf-${key}-goalKcal">Дельта от TDEE, ккал/день</label>
+            <input id="pf-${key}-goalKcal" type="number" min="-1500" max="1500" step="50" data-pf="${key}" data-pf-key="goalKcal" value="${p.goalKcal}">
+            <div class="hint">Отрицательное = дефицит</div>
+          </div>
+          <div class="profile-field">
+            <label for="pf-${key}-protein">Белок, г/кг массы</label>
+            <input id="pf-${key}-protein" type="number" min="0.5" max="3.5" step="0.1" data-pf="${key}" data-pf-key="proteinPerKg" value="${p.proteinPerKg}">
+            <div class="hint">${p.weight} × ${p.proteinPerKg} = <b>${macros.proteinG} г белка/день</b></div>
+          </div>
+          <div class="profile-field">
+            <label for="pf-${key}-fat">Жир, % от ккал</label>
+            <input id="pf-${key}-fat" type="number" min="10" max="60" step="1" data-pf="${key}" data-pf-key="fatPercent" value="${p.fatPercent}">
+            <div class="hint">${macros.kcal} × ${p.fatPercent}% / 9 = <b>${macros.fatG} г жира/день</b></div>
+          </div>
+          <div class="profile-field">
+            <label>Углеводы (расчёт)</label>
+            <input type="number" value="${macros.carbsG}" disabled>
+            <div class="hint">Остаток калорий ÷ 4</div>
+          </div>
+        </div>
+
+        <div class="profile-summary">
+          <div class="row">
+            <span class="pl-label">План:</span>
+            <span><span class="pl-val">${macros.kcal}<small> ккал</small></span></span>
+            <span class="pl-arrow">·</span>
+            <span>Б <span class="pl-val">${macros.proteinG}<small>г</small></span></span>
+            <span>Ж <span class="pl-val">${macros.fatG}<small>г</small></span></span>
+            <span>У <span class="pl-val">${macros.carbsG}<small>г</small></span></span>
+          </div>
+          <div class="row">
+            <span class="pl-label">Факт (среднее из меню):</span>
+            <span><span class="pl-val ${cls(dK, p.deltaTol)}">${factK}<small> ккал · ${fmtDelta(dK)}</small></span></span>
+            <span class="pl-arrow">·</span>
+            <span>Б <span class="pl-val ${cls(dP, 10)}">${factP}<small>г · ${fmtDelta(dP)}</small></span></span>
+            <span>Ж <span class="pl-val ${cls(dF, 10)}">${factF}<small>г · ${fmtDelta(dF)}</small></span></span>
+            <span>У <span class="pl-val ${cls(dC, 20)}">${factC}<small>г · ${fmtDelta(dC)}</small></span></span>
+          </div>
+          <div class="profile-formula">target = ${p.tdee} + (${p.goalKcal>=0?'+':''}${p.goalKcal}) = <b>${macros.kcal} ккал/день</b>. Белок: ${p.weight}кг × ${p.proteinPerKg} = ${macros.proteinG}г · Жир: ${p.fatPercent}% × ${macros.kcal} ÷ 9 = ${macros.fatG}г · Углеводы: остаток ${macros.carbsKcal} ккал ÷ 4 = ${macros.carbsG}г.</div>
+        </div>
+
+        ${buildProfileLiveTable(key)}
+
+        ${(() => {
+          // Multi-macro диагностика
+          const who = key === 'lp' ? 'lp' : 'partner';
+          const origAvg = Math.round(getOriginalAvgKcal(who));
+          const avgTarget = Math.round(profileAvgDailyTarget(p));
+          const scales = p.autoScale ? profileMacroScales(p) : { P:1, F:1, C:1, M:1 };
+          const fmtS = (s) => `×${s.toFixed(2)}`;
+          const pctS = (s) => `${s>=1?'+':''}${Math.round((s-1)*100)}%`;
+          const isClamp = (s) => Math.abs(s - 0.3) < 0.01 || Math.abs(s - 3.0) < 0.01;
+          const cls = (s) => isClamp(s) ? 'warn' : (Math.abs(s-1) < 0.05 ? 'ok' : '');
+          const warnAny = isClamp(scales.P) || isClamp(scales.F) || isClamp(scales.C);
+          return `
+          <div class="profile-apply ${isIs?'is':''}">
+            <div class="profile-apply-title">Автомасштабирование меню по макросам</div>
+            <div class="profile-apply-text">
+              ${p.autoScale ? `
+                Исходное меню ${p.name} = <b>${origAvg} ккал/день</b>, цель = <b>${avgTarget}</b> (со скейлом по дням).<br>
+                <b>Раздельные коэффициенты по группам продуктов:</b>
+                <div class="macro-scales">
+                  <div class="ms-row ${cls(scales.P)}"><span class="ms-label">Белковые <small>мясо/рыба/яйца/творог/протеин</small></span><span class="ms-val">${fmtS(scales.P)} <small>(${pctS(scales.P)})</small></span></div>
+                  <div class="ms-row ${cls(scales.F)}"><span class="ms-label">Жирные <small>масло/орехи/семена/шоколад</small></span><span class="ms-val">${fmtS(scales.F)} <small>(${pctS(scales.F)})</small></span></div>
+                  <div class="ms-row ${cls(scales.C)}"><span class="ms-label">Углеводные <small>крупы/фрукты/хлебцы/мёд</small></span><span class="ms-val">${fmtS(scales.C)} <small>(${pctS(scales.C)})</small></span></div>
+                </div>
+                ${warnAny ? `<div class="profile-warn" style="margin-top:8px;"><b>⚠ Один из коэффициентов упёрся в границу (0.30 или 3.00).</b> Это значит структура меню не позволяет попасть в цель — нужно вручную добавить/убрать продуктов соответствующей группы в DISHES.</div>` : ''}
+              ` : `Меню показывается «как написано в коде». Ккал и БЖУ — исходные.`}
+            </div>
+            <div class="profile-apply-actions">
+              <label class="profile-radio ${p.autoScale?'checked':''}">
+                <input type="checkbox" data-pf="${key}" data-pf-key="autoScale" ${p.autoScale?'checked':''}>
+                ${p.autoScale ? '✓ Автомасштабирование включено' : 'Включить автомасштабирование'}
+              </label>
+            </div>
+          </div>`;
+        })()}
+
+        <div class="profile-field" style="margin-top:8px;">
+          <label>Дневные таргеты ккал</label>
+          <div class="profile-targets-mode">
+            <div class="profile-radio-group">${modeRadios}</div>
+            ${p.targetMode==='auto' ? `
+              <span style="font-size:12px;color:var(--ink-soft);">Тренир: <input type="number" min="50" max="150" step="5" style="width:60px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;font-weight:600;" data-pf="${key}" data-pf-key="trainPct" value="${p.trainPct}">% · Отдых: <input type="number" min="50" max="150" step="5" style="width:60px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;font-weight:600;" data-pf="${key}" data-pf-key="restPct" value="${p.restPct}">%</span>
+            ` : `<button class="btn-ghost" data-pf-action="copy-auto" data-pf-key-action="${key}" type="button" style="padding:6px 10px;font-size:11.5px;">Скопировать из авто</button>`}
+          </div>
+          <div class="profile-targets" data-mode="${p.targetMode}">${targets}</div>
+        </div>
+      </div>
+    `;
+  };
+
+  const tripCards = TRIPS.map((t, i) => {
+    const dayChks = DAY_ORDER.map(d => {
+      const checked = t.days.includes(d);
+      return `<label class="trip-day-chk ${checked?'checked':''}">
+        <input type="checkbox" data-trip-day="${i}|${d}" ${checked?'checked':''}>
+        ${d}
+      </label>`;
+    }).join('');
+    return `<div class="trip-card">
+      <div class="trip-card-head">
+        <input class="trip-icon" type="text" maxlength="2" data-trip-key="${i}|icon" value="${t.icon||''}" aria-label="Иконка группы">
+        <input class="trip-name" type="text" data-trip-key="${i}|name" value="${t.name}" placeholder="Название группы">
+        <button class="trip-del" data-trip-del="${i}" type="button">Удалить</button>
+      </div>
+      <div class="trip-days">${dayChks}</div>
+    </div>`;
+  }).join('');
+
+  // Покрытие: какие дни не входят ни в одну группу
+  const covered = new Set();
+  for (const t of TRIPS) for (const d of t.days) covered.add(d);
+  const missing = DAY_ORDER.filter(d => !covered.has(d));
+  const warn = missing.length ? `<div class="profile-warn"><b>Внимание:</b> дни ${missing.join(', ')} не входят ни в одну группу — продукты этих дней попадут в первую группу как fallback.</div>` : '';
+
+  const activeKey = activeProfileKey;
+  document.getElementById('profileContent').innerHTML = `
+    <div class="profile-switch" role="tablist" aria-label="Профиль">
+      <button data-profile-tab="lp" class="${activeKey==='lp'?'active':''}" type="button">${PROFILE.lp.name} · основной</button>
+      <button data-profile-tab="is" class="${activeKey==='is'?'active':''}" type="button">${PROFILE.is.name} · партнёр</button>
+    </div>
+    <div class="profile-effects" id="profileEffects" style="margin-top:0;">
+      <div class="profile-effects-head" id="profileEffectsToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="profileEffectsBody">
+        <span class="profile-effects-title">Что меняется при правке полей ниже</span>
+        <svg class="profile-effects-chev" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="profile-effects-body" id="profileEffectsBody">
+        <ul>
+          <li><span class="arrow">→</span><div><b>TDEE / Дельта / Цель</b> → target ккал/день → <b>граммовки всех блюд</b> человека пересчитываются (если включено автомасштабирование) → ккал, БЖУ, закупки и заготовки тоже.</div></li>
+          <li><span class="arrow">→</span><div><b>Белок г/кг, Жир %</b> → таргет БЖУ в карточках «факт vs цель» в КБЖУ.</div></li>
+          <li><span class="arrow">→</span><div><b>Вес</b> → пересчитывает г/кг белка.</div></li>
+          <li><span class="arrow">→</span><div><b>Имя</b> → подменяется во всех табах.</div></li>
+          <li><span class="arrow">→</span><div><b>Толерантность Δ, train/rest %</b> → дневные «Цели» в КБЖУ и Меню, цвет дельты (зелёный/красный коридор).</div></li>
+          <li style="border-bottom:none;"><span class="arrow">→</span><div><b>Автомасштабирование</b> можно отключить чекбоксом в карточке — тогда меню остаётся «как написано в коде».</div></li>
+        </ul>
+      </div>
+    </div>
+    ${personCard(activeKey)}
+    <div class="profile-card">
+      <div class="profile-card-head">
+        <span class="badge">Закупки</span>
+        <h3>Группы походов в магазин</h3>
+      </div>
+      <div class="trips-list" id="tripsList">${tripCards}</div>
+      ${warn}
+      <div class="profile-actions">
+        <button class="btn-primary" id="trip-add" type="button">+ Добавить группу</button>
+        <button class="btn-ghost" id="trip-reset" type="button">Сбросить к дефолту</button>
+      </div>
+    </div>
+    <div class="profile-actions">
+      <button class="btn-ghost" id="profile-reset" type="button">Сбросить профили к дефолту</button>
+    </div>
+  `;
+
+  // Переключатель LP / IS
+  document.querySelectorAll('[data-profile-tab]').forEach(btn => {
+    btn.onclick = () => {
+      activeProfileKey = btn.dataset.profileTab;
+      renderProfile();
+    };
+  });
+
+  // Сворашка «Что меняется»
+  const eff = document.getElementById('profileEffects');
+  const effHead = document.getElementById('profileEffectsToggle');
+  if (eff && effHead) {
+    const toggle = () => {
+      const open = eff.classList.toggle('open');
+      effHead.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+    effHead.onclick = toggle;
+    effHead.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
+  }
+
+  // Привязка: профили — числовые/текстовые поля
+  document.querySelectorAll('input[data-pf]:not([type="radio"])').forEach(inp => {
+    inp.oninput = () => {
+      const key = inp.dataset.pf;
+      const t = inp.dataset.pfTarget;
+      const k = inp.dataset.pfKey;
+      if (t) {
+        const v = parseInt(inp.value, 10);
+        PROFILE[key].targets[t] = isNaN(v) ? 0 : v;
+      } else if (k === 'name') {
+        PROFILE[key][k] = inp.value.trim() || (key === 'lp' ? 'LP' : 'IS');
+      } else if (k === 'weight') {
+        // При изменении веса пересчитываем TDEE пропорционально (сохраняем ккал/кг)
+        const v = parseFloat(inp.value);
+        const oldW = PROFILE[key].weight;
+        if (!isNaN(v) && v > 0) {
+          if (oldW > 0 && PROFILE[key].tdee > 0) {
+            const kcalPerKg = PROFILE[key].tdee / oldW;
+            PROFILE[key].tdee = Math.round(v * kcalPerKg);
+          }
+          PROFILE[key].weight = v;
+        }
+      } else {
+        const v = parseFloat(inp.value);
+        if (!isNaN(v)) PROFILE[key][k] = v;
+      }
+      saveProfile();
+      // меню масштабируется → пересобрать закупки, потом перерисовать всё
+      rebuildShopUsage();
+      renderHeader(); renderKbju(); renderDay(currentDay); renderShop(); renderPrep();
+      // обновить сводку и формулы внутри профиля без потери фокуса
+      updateProfileSummary(key);
+    };
+  });
+
+  // Привязка: профили — radio (goal, targetMode)
+  document.querySelectorAll('input[type="radio"][data-pf]').forEach(rad => {
+    rad.onchange = () => {
+      const key = rad.dataset.pf;
+      const k = rad.dataset.pfKey;
+      const v = rad.value;
+      PROFILE[key][k] = v;
+      // подстройки: если goal=maintain → goalKcal=0; cut → -500 если положительный; bulk → +300 если отрицательный
+      if (k === 'goal') {
+        if (v === 'maintain') PROFILE[key].goalKcal = 0;
+        if (v === 'cut' && PROFILE[key].goalKcal >= 0) PROFILE[key].goalKcal = -500;
+        if (v === 'bulk' && PROFILE[key].goalKcal <= 0) PROFILE[key].goalKcal = 300;
+      }
+      saveProfile();
+      rebuildShopUsage();
+      renderProfile(); // полная перерисовка — потому что меняется readonly у targets / видимость trainPct
+      renderHeader(); renderKbju(); renderDay(currentDay); renderShop(); renderPrep();
+    };
+  });
+
+  // Чекбокс autoScale внутри карточки профиля
+  document.querySelectorAll('input[type="checkbox"][data-pf]').forEach(chk => {
+    chk.onchange = () => {
+      const key = chk.dataset.pf;
+      const k = chk.dataset.pfKey;
+      PROFILE[key][k] = chk.checked;
+      saveProfile();
+      // полный пересчёт меню
+      rebuildShopUsage();
+      renderProfile(); renderHeader(); renderDay(currentDay); renderKbju(); renderShop(); renderPrep();
+    };
+  });
+
+  // Кнопка «Скопировать из авто» — заполняет manual-targets значениями автомата
+  document.querySelectorAll('[data-pf-action="copy-auto"]').forEach(btn => {
+    btn.onclick = () => {
+      const key = btn.dataset.pfKeyAction;
+      const p = PROFILE[key];
+      const prevMode = p.targetMode;
+      p.targetMode = 'auto';
+      for (const d of DAY_ORDER) p.targets[d] = profileDailyTarget(p, d);
+      p.targetMode = prevMode; // вернули
+      saveProfile();
+      renderProfile();
+      renderKbju();
+    };
+  });
+
+  // Привязка: trips — дни
+  document.querySelectorAll('[data-trip-day]').forEach(chk => {
+    chk.onchange = () => {
+      const [iStr, day] = chk.dataset.tripDay.split('|');
+      const i = +iStr;
+      const t = TRIPS[i];
+      const has = t.days.includes(day);
+      if (chk.checked && !has) t.days.push(day);
+      if (!chk.checked && has) t.days = t.days.filter(x => x !== day);
+      // отсортировать дни по DAY_ORDER
+      t.days.sort((a,b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b));
+      saveTrips();
+      renderProfile(); // перерисуем для предупреждения о missing
+      renderShopToolbar(); renderShop();
+    };
+  });
+
+  // Привязка: trips — имя/иконка
+  document.querySelectorAll('[data-trip-key]').forEach(inp => {
+    inp.oninput = () => {
+      const [iStr, k] = inp.dataset.tripKey.split('|');
+      TRIPS[+iStr][k] = inp.value;
+      saveTrips();
+      renderShopToolbar(); renderShop();
+    };
+  });
+
+  // Удалить группу
+  document.querySelectorAll('[data-trip-del]').forEach(btn => {
+    btn.onclick = () => {
+      const i = +btn.dataset.tripDel;
+      if (TRIPS.length <= 1) { alert('Должна остаться хотя бы одна группа закупок'); return; }
+      TRIPS.splice(i, 1);
+      saveTrips();
+      renderProfile();
+      renderShopToolbar(); renderShop();
+    };
+  });
+
+  document.getElementById('trip-add').onclick = () => {
+    const usedIds = new Set(TRIPS.map(t => t.id));
+    let id = 'trip', n = 1;
+    while (usedIds.has(`${id}${n}`)) n++;
+    TRIPS.push({ id: `${id}${n}`, name: 'Новая группа', icon: '🧺', days: [] });
+    saveTrips();
+    renderProfile();
+    renderShopToolbar(); renderShop();
+  };
+  document.getElementById('trip-reset').onclick = () => {
+    if (!confirm('Сбросить группы закупок к дефолту?')) return;
+    TRIPS = JSON.parse(JSON.stringify(DEFAULT_TRIPS));
+    saveTrips();
+    renderProfile();
+    renderShopToolbar(); renderShop();
+  };
+  document.getElementById('profile-reset').onclick = () => {
+    if (!confirm('Сбросить оба профиля LP и IS к дефолтным значениям?')) return;
+    PROFILE = JSON.parse(JSON.stringify(DEFAULT_PROFILE));
+    saveProfile();
+    renderProfile();
+    renderHeader(); renderKbju(); renderDay(currentDay);
+  };
+}
+
+// =========================================================================
+// TABS
+// =========================================================================
+function switchTo(panel) {
+  document.querySelectorAll('.tab').forEach(t => {
+    const on = t.dataset.panel === panel;
+    t.classList.toggle('active', on);
+    t.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${panel}`));
+}
+function setupTabs() {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.onclick = () => { switchTo(tab.dataset.panel); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  });
+}
+
+// =========================================================================
+// INIT
+// =========================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  loadProfile();
+  loadTrips();
+  rebuildShopUsage();
+  setupTabs();
+  renderHeader();
+  renderDaysNav();
+  renderDay('Пн');
+  renderKbju();
+  renderShopToolbar();
+  renderShop();
+  renderPortionDaysNav();
+  renderPortionMealSelect();
+  renderProfile();
+  // Расчёт порций инициализирован выше через renderPortionDaysNav/renderPortionMealSelect
+  renderPortion();
+  renderPrep();
+});
+</script>
+</body>
+</html>

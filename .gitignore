@@ -1,0 +1,17 @@
+# Системные
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Claude Code локальное состояние
+.claude/
+
+# Временные / черновики
+*.tmp
+*.bak
+~*
+
+# Исходники иконок (сами иконки icon-*.png и apple-touch-icon.png должны быть в репо!)
+icon-source.png
+new-icon.png
+ChatGPT Image*
