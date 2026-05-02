@@ -77,6 +77,28 @@ h3 { font-size: 18px; font-weight: 600; }
 .day-btn.rest .day-tag { color: var(--sage); }
 .day-btn.active { background: var(--ink); border-color: var(--ink); }
 .day-btn.active .day-name, .day-btn.active .day-tag { color: var(--bg-elev); }
+.day-btn.today { box-shadow: 0 0 0 2px var(--gold); position: relative; }
+.day-btn.today::before { content: '●'; position: absolute; top: 2px; right: 4px; color: var(--gold); font-size: 8px; line-height: 1; }
+.day-btn.today.active { box-shadow: 0 0 0 2px var(--gold); }
+
+/* Плашка «Сейчас» с кнопкой «к сегодня» */
+.now-bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin-bottom: 10px; background: var(--bg-elev); border-radius: var(--radius-sm); border: 1px solid var(--line-soft); font-size: 12px; color: var(--ink-soft); flex-wrap: wrap; }
+.now-bar .now-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+.now-bar b { color: var(--ink); font-weight: 600; }
+.now-bar .now-time { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.now-bar .now-go { margin-left: auto; background: var(--ink); color: var(--bg-elev); border: none; border-radius: 6px; padding: 6px 12px; font-family: inherit; font-size: 11.5px; font-weight: 600; cursor: pointer; min-height: 30px; }
+.now-bar .now-go:hover { background: var(--accent-deep); }
+.now-bar .now-go[disabled] { background: var(--line); color: var(--ink-muted); cursor: default; }
+
+.meal.now-meal { box-shadow: 0 0 0 2px var(--gold), var(--shadow); }
+.meal.now-meal .meal-header { position: relative; }
+.meal.now-meal .meal-header::before {
+  content: 'СЕЙЧАС';
+  position: absolute; top: -8px; left: 12px;
+  background: var(--gold); color: var(--bg-elev);
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+  padding: 2px 7px; border-radius: 4px;
+}
 
 .day-summary { background: var(--bg-elev); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--line-soft); }
 .day-summary-head { margin-bottom: 8px; }
@@ -1227,6 +1249,46 @@ function calcWeek(who = 'lp') {
 }
 function fmt(x, d = 0) { return Number(x).toFixed(d); }
 function fmtDelta(n) { return n === 0 ? '0' : (n > 0 ? `+${n}` : `${n}`); }
+
+// Текущий день недели в нашей нотации Пн/Вт/...
+const JS_DAY_TO_RU = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+function currentDayCode(date = new Date()) {
+  return JS_DAY_TO_RU[date.getDay()];
+}
+// Текущий приём пищи по часу:
+//  00:00–10:59 → Завтрак · 11:00–14:59 → Обед · 15:00–16:59 → Перекус · 17:00–23:59 → Ужин
+function currentMealType(date = new Date()) {
+  const h = date.getHours();
+  if (h < 11) return 'Завтрак';
+  if (h < 15) return 'Обед';
+  if (h < 17) return 'Перекус';
+  return 'Ужин';
+}
+// Mid текущего приёма (первый MEAL текущего дня с подходящим type)
+function currentMid(date = new Date()) {
+  const day = currentDayCode(date);
+  const type = currentMealType(date);
+  const meals = DAYS[day]?.meals || [];
+  return meals.find(mid => MEALS[mid]?.type === type) || null;
+}
+
+// Плашка «Сейчас» — индикатор текущего дня/приёма + кнопка возврата
+// context: 'menu' (для вкладки Меню) или 'portion' (для Расчёта порций)
+function buildNowBar(context, selectedDay, selectedMid) {
+  const now = new Date();
+  const day = currentDayCode(now);
+  const type = currentMealType(now);
+  const mid = currentMid(now);
+  const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const onTarget = (selectedDay === day) && (mid ? selectedMid === mid : true);
+  const dataAttr = context === 'menu' ? 'data-now-go-menu' : 'data-now-go-portion';
+  return `<div class="now-bar">
+    <span class="now-dot" aria-hidden="true"></span>
+    <span>Сейчас: <b>${day}</b> · <b>${type}</b></span>
+    <span class="now-time">${t}</span>
+    <button class="now-go" ${dataAttr} type="button" ${onTarget?'disabled':''} title="Перейти к сегодняшнему дню и текущему приёму">${onTarget?'✓ открыто':'→ к сегодня'}</button>
+  </div>`;
+}
 function dayIcon(type) { return type === 'train' ? '💪' : '🌿'; }
 
 // Безопасный доступ к localStorage (приватный режим / отключённое хранилище)
@@ -1261,15 +1323,18 @@ function renderHeader() {
 // =========================================================================
 // MENU PANEL
 // =========================================================================
-let currentDay = 'Пн';
+let currentDay = currentDayCode();
 function renderDaysNav() {
   const nav = document.getElementById('daysNav');
   nav.innerHTML = '';
-  DAY_ORDER.forEach((d, i) => {
+  const today = currentDayCode();
+  DAY_ORDER.forEach((d) => {
     const day = DAYS[d];
+    const isToday = d === today;
     const btn = document.createElement('button');
-    btn.className = `day-btn ${day.type}` + (d === currentDay ? ' active' : '');
+    btn.className = `day-btn ${day.type}` + (d === currentDay ? ' active' : '') + (isToday ? ' today' : '');
     btn.dataset.day = d;
+    btn.title = (isToday ? 'Сегодня · ' : '') + day.label;
     btn.innerHTML = `<span class="day-name">${d}</span><span class="day-tag" title="${day.label}">${dayIcon(day.type)}</span>`;
     btn.onclick = () => { currentDay = d; renderDaysNav(); renderDay(d); };
     nav.appendChild(btn);
@@ -1293,6 +1358,7 @@ function renderDay(d) {
   const isVs = isTarget ? `<span class="vs-target ${isOk?'ok':'warn'}">цель <b>${isTarget}</b> · <span class="delta ${isOk?'ok':'warn'}">${fmtDelta(isDelta)}</span> ккал</span>` : '';
 
   let html = `
+    ${buildNowBar('menu', d, null)}
     <div class="day-summary">
       <div class="day-summary-head">
         <h2>${d} <small class="${day.type}" title="${day.label}">${dayIcon(day.type)}</small></h2>
@@ -1321,10 +1387,13 @@ function renderDay(d) {
     const dishNames = meal.dishes.map(did => `<span class="dish-icon">${dishIcon(did)}</span> ${DISHES[did].name}`).join(' <span class="sep">·</span> ');
     const trainTag = meal.train === 'pre' ? '<span class="tag-train">⤴ пред-трен</span>'
                     : meal.train === 'post' ? '<span class="tag-train">⤵ пост-трен</span>' : '';
+    const isNow = (d === currentDayCode()) && (mid === currentMid());
+    const nowCls = isNow ? ' now-meal open' : '';
+    const ariaExp = isNow ? 'true' : 'false';
 
     html += `
-      <article class="meal" data-mid="${mid}">
-        <header class="meal-header" role="button" tabindex="0" aria-expanded="false" aria-controls="meal-body-${mid}">
+      <article class="meal${nowCls}" data-mid="${mid}">
+        <header class="meal-header" role="button" tabindex="0" aria-expanded="${ariaExp}" aria-controls="meal-body-${mid}">
           <div class="meal-header-l">
             <div class="meal-tag">${meal.type}${trainTag}</div>
             <div class="meal-dishnames">${dishNames}</div>
@@ -1441,6 +1510,20 @@ function renderDay(d) {
     h.onclick = () => toggleMeal(h);
     h.onkeydown = (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMeal(h); }
+    };
+  });
+
+  // Кнопка «к сегодня» — переключает на текущий день и скроллит к текущему приёму
+  cont.querySelectorAll('[data-now-go-menu]').forEach(btn => {
+    btn.onclick = () => {
+      currentDay = currentDayCode();
+      renderDaysNav();
+      renderDay(currentDay);
+      setTimeout(() => {
+        const cur = currentMid();
+        const m = cur ? document.querySelector(`.meal[data-mid="${cur}"]`) : null;
+        (m || document.querySelector('.now-bar'))?.scrollIntoView({ behavior:'smooth', block:'start' });
+      }, 50);
     };
   });
 
@@ -1872,21 +1955,23 @@ function renderShop() {
 // =========================================================================
 // PORTIONS PANEL — день → приём пищи → все блюда этого приёма
 // =========================================================================
-let portionDay = 'Пн';
-let portionMid = DAYS['Пн'].meals[0];
+let portionDay = currentDayCode();
+let portionMid = currentMid() || DAYS[portionDay].meals[0];
 
 function renderPortionDaysNav() {
   const nav = document.getElementById('portionDaysNav');
   nav.innerHTML = '';
+  const today = currentDayCode();
   DAY_ORDER.forEach(d => {
     const day = DAYS[d];
+    const isToday = d === today;
     const btn = document.createElement('button');
-    btn.className = `day-btn ${day.type}` + (d === portionDay ? ' active' : '');
+    btn.className = `day-btn ${day.type}` + (d === portionDay ? ' active' : '') + (isToday ? ' today' : '');
     btn.dataset.day = d;
+    btn.title = (isToday ? 'Сегодня · ' : '') + day.label;
     btn.innerHTML = `<span class="day-name">${d}</span><span class="day-tag" title="${day.label}">${dayIcon(day.type)}</span>`;
     btn.onclick = () => {
       portionDay = d;
-      // выберем первый приём этого дня
       portionMid = DAYS[d].meals[0] || null;
       renderPortionDaysNav();
       renderPortionMealSelect();
@@ -2119,6 +2204,7 @@ function renderPortion() {
   const dishBlocks = meal.dishes.map(did => buildDishBlock(did)).join('');
 
   out.innerHTML = `
+    ${buildNowBar('portion', portionDay, portionMid)}
     <div class="portion-result" style="background:var(--bg-soft);">
       <div class="meal-tag" style="margin-bottom:6px;">${portionDay} · ${meal.type}${meal.train==='pre'?' <span class="tag-train">⤴ пред-трен</span>':meal.train==='post'?' <span class="tag-train">⤵ пост-трен</span>':''}</div>
       <h3 style="margin-bottom:8px;">${meal.dishes.map(did => DISHES[did].name).join(' · ')}</h3>
@@ -2157,6 +2243,16 @@ function renderPortion() {
       const fid = btn.dataset.resetFid;
       const did = btn.dataset.resetDid;
       if (portionActuals[did]) delete portionActuals[did][fid];
+      renderPortion();
+    };
+  });
+  // «к сегодня» — переключиться на текущий день и приём
+  out.querySelectorAll('[data-now-go-portion]').forEach(btn => {
+    btn.onclick = () => {
+      portionDay = currentDayCode();
+      portionMid = currentMid() || (DAYS[portionDay].meals[0] || null);
+      renderPortionDaysNav();
+      renderPortionMealSelect();
       renderPortion();
     };
   });
